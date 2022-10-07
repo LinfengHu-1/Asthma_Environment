@@ -326,3 +326,22 @@ hist(dat_full$TOBDataValue)
 hist(dat_full$HlthCareDataValue)
 hist(dat_full$DataValue.x.x)
 ```
+```{r}
+#air pollutant exploratory
+
+par(mfrow = c(3,2))
+boxplot(dat_full$DataValue ~ dat_full$o3_mean)
+boxplot(dat_full$DataValue ~ dat_full$pm2.5_mean)
+boxplot(dat_full$DataValue ~ dat_full$so2_mean)
+boxplot(dat_full$DataValue ~ dat_full$co_mean)
+boxplot(dat_full$DataValue ~ dat_full$no2_mean)
+
+pairs(o3_mean ~ pm2.5_mean + so2_mean + co_mean + no2_mean, data = dat_full)
+```
+
+```{r}
+#asthma exploratory
+hist(dat_full$DataValue)
+
+
+```
