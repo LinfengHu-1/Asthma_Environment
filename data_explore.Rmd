@@ -1,6 +1,6 @@
 ---
 title: "data_exploration"
-author: "Pluto Zhang"
+author: "Group 21"
 date: "2022-10-07"
 output:
   html_document:
@@ -22,25 +22,21 @@ library(ggthemes)
 library(ggrepel)
 # data cleaning for socio economic factors
 soecon <- read_csv('soecon.csv')
-dat_full <- read.csv("fulldata.csv")
 fulldat <- read_csv('FullData.csv')
-
+names(fulldat)[names(fulldat) == 'DataValue'] <- 'Asthmap'
+names(fulldat)[names(fulldat) == 'TOBDataValue'] <- 'TOB'
 ```
 
 
-#EDA of socioeconomic data
+#### EDA of socioeconomic data
 ```{r}
 names(soecon)
 ```
-
-
 
 Run a summary of the variables in socioeconomic category
 ```{r}
 summary(soecon)
 ```
-
-
 
 Draw histograms of the variables in the dataset
 ```{r}
@@ -72,6 +68,7 @@ based on the histograms, most of the variables have skewed distribution, but aft
 ```{r}
 pairs(soecon$total_homeless ~ soecon$SNAP + soecon$unemployment_rate + soecon$Total_poverty )
 ```
+
 Based on the paired scatter plot, there is no obvious colinearity between the four main socioeconomic variables: SNAP enrollment, total_poverty rate, unemployment rate and total number of homeless people, which means that these four variables are independent with each other. 
 
 
@@ -79,7 +76,8 @@ Based on the paired scatter plot, there is no obvious colinearity between the fo
 # for the homeless variable, test for colinearity between its three subvariables 
 pairs(soecon$total_homeless ~ soecon$individual_homeless + soecon$fam_homeless)
 ```
-from the paired scatter plot, we can see that the total number of homeless people is correlated with number os homeless individuals and the number of homeless people in families, so these three variables are not independent with each other.
+
+From the paired scatter plot, we can see that the total number of homeless people is correlated with number os homeless individuals and the number of homeless people in families, so these three variables are not independent with each other.
 ```{r}
 # for the homeless variable, test for colinearity between its three subvariables 
 pairs(soecon$Total_poverty ~ soecon$Male_poverty + soecon$Female_poverty)
@@ -89,50 +87,43 @@ By plotting the percentage of males and females that are in poverty in each stat
 
 
 
-
-<<<<<<< HEAD
-
-#### CDI data
+#### EDA for CDI data
 ```{r}
-names(dat_full[, 1:25])
+names(fulldat[, 1:25])
 ```
 ```{r}
-dat_full <- read.csv("FullData.csv")
-summary(dat_full[, 4:25])
+summary(fulldat[, 4:25])
 ```
 ```{r}
-hist(dat_full$DataValue, main='Histogram of asthma crude prevalence among women aged 18-44 years across states' )
-hist(dat_full$TOBDataValue, main='Histogram of Percent current cigarette smoking among women aged 18-44 years across states')
-hist(dat_full$selfHlthDataValue, main = 'Histogram of Self-rated health status among women aged 18-44 years across states')
+hist(fulldat$Asthmap, main='Histogram of asthma crude prevalence 
+     among women aged 18-44 years across states' )
+hist(fulldat$TOB, main='Histogram of Percent current cigarette smoking 
+     among women aged 18-44 years across states')
+hist(fulldat$selfHlthDataValue, main = 'Histogram of Self-rated health status 
+     among women aged 18-44 years across states')
 ```
+Based on these histograms, we can see that most of the covariates here are normally distributed with some skewness since they're data from the realworld.
 
-
-
-
-
-=======
 ```{r}
-par(mfrow=c(3,6))
-hist(dat_full$DataValue.x)
-hist(dat_full$TOBDataValue)
-hist(dat_full$HlthCareDataValue)
-hist(dat_full$DataValue.x.x)
+# paired scatter plots of Asthma Prevalence and CDI variables 
+pairs(Asthmap ~ TOB + selfHlthDataValue + HlthCareDataValue, dat = fulldat)
 ```
+Based on these paired comparisons, we can see that the asthma prevalence has a relatively strong correlation with health care coverage data compared to the other two covariates. It will likely be a confounder that needs to be addressed.
 
 
+#### EDA for Air Pollution Data
 ```{r}
 #air pollutant exploratory
 
 par(mfrow = c(3,2))
-plot(dat_full$DataValue ~ dat_full$o3_mean, ylab = "Asthma Pervalence", xlab = "Ozone")
-plot(dat_full$DataValue ~ dat_full$pm2.5_mean,ylab = "Asthma Pervalence", xlab = "PM2.5")
-plot(dat_full$DataValue ~ dat_full$so2_mean,ylab = "Asthma Pervalence", xlab = "Sulfur Dioxide")
-plot(dat_full$DataValue ~ dat_full$co_mean, ylab = "Asthma Pervalence", xlab = "Carbon Monoxide")
-plot(dat_full$DataValue ~ dat_full$no2_mean, ylab = "Asthma Pervalence", xlab = "Nitrogen Dioxide")
+plot(fulldat$Asthmap ~ fulldat$o3_mean, ylab = "Asthma Pervalence", xlab = "Ozone")
+plot(fulldat$Asthmap ~ fulldat$pm2.5_mean,ylab = "Asthma Pervalence", xlab = "PM2.5")
+plot(fulldat$Asthmap ~ fulldat$so2_mean,ylab = "Asthma Pervalence", xlab = "Sulfur Dioxide")
+plot(fulldat$Asthmap ~ fulldat$co_mean, ylab = "Asthma Pervalence", xlab = "Carbon Monoxide")
+plot(fulldat$Asthmap ~ fulldat$no2_mean, ylab = "Asthma Pervalence", xlab = "Nitrogen Dioxide")
 
-pairs(o3_mean ~ pm2.5_mean + so2_mean + co_mean + no2_mean, data = dat_full)
+pairs(o3_mean ~ pm2.5_mean + so2_mean + co_mean + no2_mean, data = fulldat)
 ```
->>>>>>> 6e98b540ba43e672cb60c0ef0d4f92ae0bfda457
 
 
 ```{r}
@@ -143,17 +134,9 @@ pairs(Asthmap ~ total_homeless + SNAP + unemployment_rate + Total_poverty, dat =
 from the paired scatterplot, the pervalence of Asthma is independent of the four main variables in the socioeconomic category. 
 
 
-
-
-
-#forward selection
+#### Forward Selection
 
 ```{r}
-
-names(fulldat)[names(fulldat) == 'DataValue'] <- 'Asthmap'
-names(fulldat)[names(fulldat) == 'TOBDataValue'] <- 'TOB'
-
-
 # now we try to determine which variable is more significant in predicting the Asthma prevalence
 # forward selection
 coln <- colnames(fulldat)
@@ -166,4 +149,10 @@ require(broom)
 lm1 <- lm(Asthmap ~ 1, data=fulldat)
 stepModel <- step(lm1, direction="forward",
 scope=(~ selfHlthDataValue + HlthCareDataValue + SNAP+ individual_homeless+fam_homeless+total_homeless+unemployment_rate+Male_poverty+Female_poverty+Total_poverty+o3_mean+pm2.5_mean+so2_mean+co_mean+no2_mean), data=fulldat)
+```
+
+From the results of forward selection, we can roughly have an idea on which covariates may have a stronger effect as a confounder. We can see that the variables that we may need to include in our final model are: health care coverage data, homeless percentage, unemployment rate, poverty rate, self-rated health status and $NO_2$ level.
+
+
+
 
