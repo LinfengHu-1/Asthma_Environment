@@ -1,3 +1,595 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:69d5bd67a11d0afb508c9a5b6e60135ee3e00f74b44c7572ff421a3ecfafd3cf
-size 14861
+﻿Location,SNAP,year
+United States,"41,500,021",2021
+Alabama,"769,606",2021
+Alaska,"82,888",2021
+Arizona,"879,123",2021
+Arkansas,"346,176",2021
+California,"4,327,062",2021
+Colorado,"513,945",2021
+Connecticut,"371,632",2021
+Delaware,"115,484",2021
+District of Columbia,"140,115",2021
+Florida,"3,356,215",2021
+Georgia,"1,640,617",2021
+Hawaii,"195,834",2021
+Idaho,"132,607",2021
+Illinois,"1,930,355",2021
+Indiana,"645,754",2021
+Iowa,"286,050",2021
+Kansas,"200,344",2021
+Kentucky,"597,747",2021
+Louisiana,"924,723",2021
+Maine,"157,595",2021
+Maryland,"823,501",2021
+Massachusetts,"929,029",2021
+Michigan,"1,278,213",2021
+Minnesota,"452,652",2021
+Mississippi,"418,451",2021
+Missouri,"698,720",2021
+Montana,"97,186",2021
+Nebraska,"157,273",2021
+Nevada,"453,250",2021
+New Hampshire,"69,116",2021
+New Jersey,"825,664",2021
+New Mexico,"520,494",2021
+New York,"2,780,714",2021
+North Carolina,"1,541,661",2021
+North Dakota,"50,377",2021
+Ohio,"1,509,438",2021
+Oklahoma,"619,149",2021
+Oregon,"706,294",2021
+Pennsylvania,"1,766,450",2021
+Rhode Island,"142,149",2021
+South Carolina,"608,107",2021
+South Dakota,"74,627",2021
+Tennessee,"881,344",2021
+Texas,"3,408,385",2021
+Utah,"163,010",2021
+Vermont,"67,790",2021
+Virginia,"757,583",2021
+Washington,"927,999",2021
+West Virginia,"302,444",2021
+Wisconsin,"762,395",2021
+Wyoming,"29,118",2021
+Guam,"39,608",2021
+U.S. Virgin Islands,"23,961",2021
+United States,44708726,2011
+Alabama,920365,2011
+Alaska,86044,2011
+Arizona,1067617,2011
+Arkansas,486451,2011
+California,3672980,2011
+Colorado,453103,2011
+Connecticut,378677,2011
+Delaware,134927,2011
+District of Columbia,134845,2011
+Florida,3074671,2011
+Georgia,1780039,2011
+Hawaii,159644,2011
+Idaho,228629,2011
+Illinois,1793886,2011
+Indiana,877560,2011
+Iowa,373856,2011
+Kansas,298642,2011
+Kentucky,823472,2011
+Louisiana,884519,2011
+Maine,247943,2011
+Maryland,667738,2011
+Massachusetts,813631,2011
+Michigan,1928478,2011
+Minnesota,505919,2011
+Mississippi,622596,2011
+Missouri,943088,2011
+Montana,124243,2011
+Nebraska,174204,2011
+Nevada,332959,2011
+New Hampshire,113407,2011
+New Jersey,759136,2011
+New Mexico,414275,2011
+New York,2999991,2011
+North Carolina,1590069,2011
+North Dakota,60902,2011
+Ohio,1779237,2011
+Oklahoma,614704,2011
+Oregon,772756,2011
+Pennsylvania,1718211,2011
+Rhode Island,160201,2011
+South Carolina,844405,2011
+South Dakota,101817,2011
+Tennessee,1275790,2011
+Texas,3977273,2011
+Utah,283971,2011
+Vermont,92038,2011
+Virginia,858782,2011
+Washington,1054693,2011
+West Virginia,345955,2011
+Wisconsin,801073,2011
+Wyoming,36031,2011
+Guam,40631,2011
+Virgin Islands,22655,2011
+United States,46609072,2012
+Alabama,910244,2012
+Alaska,91298,2012
+Arizona,1123974,2012
+Arkansas,502125,2012
+California,3964221,2012
+Colorado,491630,2012
+Connecticut,403466,2012
+Delaware,148257,2012
+District of Columbia,141147,2012
+Florida,3353064,2012
+Georgia,1912839,2012
+Hawaii,176823,2012
+Idaho,233034,2012
+Illinois,1869713,2012
+Indiana,908705,2012
+Iowa,408050,2012
+Kansas,304719,2012
+Kentucky,849248,2012
+Louisiana,948758,2012
+Maine,252860,2012
+Maryland,716379,2012
+Massachusetts,861568,2012
+Michigan,1828384,2012
+Minnesota,538869,2012
+Mississippi,659872,2012
+Missouri,947889,2012
+Montana,125874,2012
+Nebraska,176073,2012
+Nevada,354900,2012
+New Hampshire,116895,2012
+New Jersey,826134,2012
+New Mexico,438252,2012
+New York,3076911,2012
+North Carolina,1668588,2012
+North Dakota,58796,2012
+Ohio,1807913,2012
+Oklahoma,614947,2012
+Oregon,815221,2012
+Pennsylvania,1799209,2012
+Rhode Island,172846,2012
+South Carolina,869801,2012
+South Dakota,103846,2012
+Tennessee,1316810,2012
+Texas,4038440,2012
+Utah,276890,2012
+Vermont,96579,2012
+Virginia,913878,2012
+Washington,1108090,2012
+West Virginia,346833,2012
+Wisconsin,835312,2012
+Wyoming,34347,2012
+Guam,43727,2012
+Virgin Islands,24827,2012
+United States,47636090,2013
+Alabama,915322,2013
+Alaska,91364,2013
+Arizona,1111105,2013
+Arkansas,504621,2013
+California,4159031,2013
+Colorado,507934,2013
+Connecticut,425320,2013
+Delaware,153137,2013
+District of Columbia,144889,2013
+Florida,3556473,2013
+Georgia,1948189,2013
+Hawaii,189350,2013
+Idaho,227006,2013
+Illinois,2040053,2013
+Indiana,926011,2013
+Iowa,420344,2013
+Kansas,316983,2013
+Kentucky,872439,2013
+Louisiana,940100,2013
+Maine,249119,2013
+Maryland,771021,2013
+Massachusetts,887619,2013
+Michigan,1775646,2013
+Minnesota,552928,2013
+Mississippi,668624,2013
+Missouri,929943,2013
+Montana,128531,2013
+Nebraska,179711,2013
+Nevada,360953,2013
+New Hampshire,117315,2013
+New Jersey,876266,2013
+New Mexico,440362,2013
+New York,3170465,2013
+North Carolina,1703700,2013
+North Dakota,56523,2013
+Ohio,1824675,2013
+Oklahoma,621831,2013
+Oregon,817575,2013
+Pennsylvania,1784790,2013
+Rhode Island,179925,2013
+South Carolina,875866,2013
+South Dakota,104052,2013
+Tennessee,1342089,2013
+Texas,4041891,2013
+Utah,251626,2013
+Vermont,100541,2013
+Virginia,940932,2013
+Washington,1113441,2013
+West Virginia,350695,2013
+Wisconsin,856730,2013
+Wyoming,38046,2013
+Guam,45554,2013
+Virgin Islands,27436,2013
+United States,46536760,2014
+Alabama,902073,2014
+Alaska,87486,2014
+Arizona,1044310,2014
+Arkansas,491965,2014
+California,4349634,2014
+Colorado,505169,2014
+Connecticut,438559,2014
+Delaware,150232,2014
+District of Columbia,142707,2014
+Florida,3526311,2014
+Georgia,1815833,2014
+Hawaii,194264,2014
+Idaho,211781,2014
+Illinois,2015303,2014
+Indiana,892699,2014
+Iowa,408070,2014
+Kansas,293456,2014
+Kentucky,828076,2014
+Louisiana,877340,2014
+Maine,230536,2014
+Maryland,787597,2014
+Massachusetts,863412,2014
+Michigan,1679421,2014
+Minnesota,533743,2014
+Mississippi,656871,2014
+Missouri,858416,2014
+Montana,124906,2014
+Nebraska,173530,2014
+Nevada,383622,2014
+New Hampshire,111701,2014
+New Jersey,883434,2014
+New Mexico,431494,2014
+New York,3122879,2014
+North Carolina,1575676,2014
+North Dakota,53753,2014
+Ohio,1752135,2014
+Oklahoma,608492,2014
+Oregon,802190,2014
+Pennsylvania,1796154,2014
+Rhode Island,178518,2014
+South Carolina,834511,2014
+South Dakota,100938,2014
+Tennessee,1312505,2014
+Texas,3852675,2014
+Utah,229911,2014
+Vermont,93000,2014
+Virginia,918902,2014
+Washington,1095551,2014
+West Virginia,362501,2014
+Wisconsin,841533,2014
+Wyoming,35871,2014
+Guam,47289,2014
+U.S. Virgin Islands,27824,2014
+United States,"45,766,672",2015
+Alabama,"889,380",2015
+Alaska,"81,121",2015
+Arizona,"999,401",2015
+Arkansas,"468,904",2015
+California,"4,417,772",2015
+Colorado,"495,134",2015
+Connecticut,"442,161",2015
+Delaware,"149,981",2015
+District of Columbia,"141,845",2015
+Florida,"3,656,169",2015
+Georgia,"1,800,531",2015
+Hawaii,"188,895",2015
+Idaho,"196,872",2015
+Illinois,"2,042,306",2015
+Indiana,"831,740",2015
+Iowa,"391,224",2015
+Kansas,"273,974",2015
+Kentucky,"768,882",2015
+Louisiana,"859,738",2015
+Maine,"202,579",2015
+Maryland,"781,035",2015
+Massachusetts,"785,778",2015
+Michigan,"1,571,344",2015
+Minnesota,"496,023",2015
+Mississippi,"636,322",2015
+Missouri,"844,597",2015
+Montana,"119,082",2015
+Nebraska,"174,092",2015
+Nevada,"420,413",2015
+New Hampshire,"106,296",2015
+New Jersey,"905,728",2015
+New Mexico,"453,146",2015
+New York,"3,039,108",2015
+North Carolina,"1,646,202",2015
+North Dakota,"53,148",2015
+Ohio,"1,676,263",2015
+Oklahoma,"598,257",2015
+Oregon,"779,749",2015
+Pennsylvania,"1,826,667",2015
+Rhode Island,"175,025",2015
+South Carolina,"804,572",2015
+South Dakota,"98,553",2015
+Tennessee,"1,229,391",2015
+Texas,"3,724,688",2015
+Utah,"225,603",2015
+Vermont,"84,994",2015
+Virginia,"860,375",2015
+Washington,"1,070,933",2015
+West Virginia,"367,908",2015
+Wisconsin,"805,540",2015
+Wyoming,"32,606",2015
+Guam,"47,166",2015
+U.S. Virgin Islands,"27,461",2015
+United States,"44,219,363",2016
+Alabama,"850,804",2016
+Alaska,"82,326",2016
+Arizona,"960,105",2016
+Arkansas,"426,069",2016
+California,"4,340,042",2016
+Colorado,"475,690",2016
+Connecticut,"431,597",2016
+Delaware,"147,559",2016
+District of Columbia,"134,625",2016
+Florida,"3,454,530",2016
+Georgia,"1,733,473",2016
+Hawaii,"176,729",2016
+Idaho,"185,303",2016
+Illinois,"1,914,393",2016
+Indiana,"741,610",2016
+Iowa,"380,705",2016
+Kansas,"253,833",2016
+Kentucky,"666,264",2016
+Louisiana,"927,168",2016
+Maine,"189,245",2016
+Maryland,"744,343",2016
+Massachusetts,"779,192",2016
+Michigan,"1,473,614",2016
+Minnesota,"478,783",2016
+Mississippi,"582,658",2016
+Missouri,"810,690",2016
+Montana,"116,626",2016
+Nebraska,"175,851",2016
+Nevada,"439,782",2016
+New Hampshire,"98,464",2016
+New Jersey,"879,987",2016
+New Mexico,"471,247",2016
+New York,"2,968,227",2016
+North Carolina,"1,568,387",2016
+North Dakota,"54,252",2016
+Ohio,"1,608,633",2016
+Oklahoma,"612,869",2016
+Oregon,"734,864",2016
+Pennsylvania,"1,863,836",2016
+Rhode Island,"171,055",2016
+South Carolina,"805,012",2016
+South Dakota,"95,983",2016
+Tennessee,"1,113,231",2016
+Texas,"3,768,472",2016
+Utah,"219,820",2016
+Vermont,"79,715",2016
+Virginia,"826,354",2016
+Washington,"1,011,412",2016
+West Virginia,"357,531",2016
+Wisconsin,"728,077",2016
+Wyoming,"33,853",2016
+Guam,"46,713",2016
+U.S. Virgin Islands,"27,760",2016
+United States,"42,173,199",2017
+Alabama,"804,336",2017
+Alaska,"89,113",2017
+Arizona,"918,728",2017
+Arkansas,"388,362",2017
+California,"4,112,066",2017
+Colorado,"459,247",2017
+Connecticut,"410,344",2017
+Delaware,"146,805",2017
+District of Columbia,"119,104",2017
+Florida,"3,186,537",2017
+Georgia,"1,625,415",2017
+Hawaii,"169,045",2017
+Idaho,"171,251",2017
+Illinois,"1,878,519",2017
+Indiana,"671,986",2017
+Iowa,"365,893",2017
+Kansas,"233,778",2017
+Kentucky,"654,873",2017
+Louisiana,"928,962",2017
+Maine,"179,734",2017
+Maryland,"684,282",2017
+Massachusetts,"766,116",2017
+Michigan,"1,375,434",2017
+Minnesota,"453,564",2017
+Mississippi,"537,370",2017
+Missouri,"758,918",2017
+Montana,"120,889",2017
+Nebraska,"175,849",2017
+Nevada,"440,614",2017
+New Hampshire,"92,457",2017
+New Jersey,"817,979",2017
+New Mexico,"460,534",2017
+New York,"2,910,894",2017
+North Carolina,"1,365,394",2017
+North Dakota,"53,748",2017
+Ohio,"1,501,795",2017
+Oklahoma,"603,896",2017
+Oregon,"680,671",2017
+Pennsylvania,"1,842,945",2017
+Rhode Island,"164,238",2017
+South Carolina,"719,977",2017
+South Dakota,"93,259",2017
+Tennessee,"1,047,058",2017
+Texas,"3,921,278",2017
+Utah,"206,299",2017
+Vermont,"76,558",2017
+Virginia,"775,548",2017
+Washington,"929,486",2017
+West Virginia,"340,308",2017
+Wisconsin,"691,635",2017
+Wyoming,"32,839",2017
+Guam,"45,263",2017
+U.S. Virgin Islands,"26,758",2017
+United States,"39,651,687",2018
+Alabama,"766,681",2018
+Alaska,"91,995",2018
+Arizona,"845,733",2018
+Arkansas,"372,451",2018
+California,"3,949,535",2018
+Colorado,"449,824",2018
+Connecticut,"387,329",2018
+Delaware,"140,298",2018
+District of Columbia,"112,282",2018
+Florida,"3,347,518",2018
+Georgia,"1,556,452",2018
+Hawaii,"163,618",2018
+Idaho,"157,858",2018
+Illinois,"1,826,011",2018
+Indiana,"617,032",2018
+Iowa,"345,406",2018
+Kansas,"217,420",2018
+Kentucky,"615,305",2018
+Louisiana,"867,342",2018
+Maine,"167,858",2018
+Maryland,"646,483",2018
+Massachusetts,"770,566",2018
+Michigan,"1,281,862",2018
+Minnesota,"428,986",2018
+Mississippi,"505,308",2018
+Missouri,"736,590",2018
+Montana,"115,223",2018
+Nebraska,"169,811",2018
+Nevada,"439,941",2018
+New Hampshire,"86,502",2018
+New Jersey,"760,303",2018
+New Mexico,"456,251",2018
+New York,"2,796,620",2018
+North Carolina,"1,138,288",2018
+North Dakota,"52,621",2018
+Ohio,"1,421,366",2018
+Oklahoma,"585,064",2018
+Oregon,"633,970",2018
+Pennsylvania,"1,818,589",2018
+Rhode Island,N/A,2018
+South Carolina,"658,119",2018
+South Dakota,"87,410",2018
+Tennessee,"970,875",2018
+Texas,"3,895,207",2018
+Utah,"189,093",2018
+Vermont,"73,058",2018
+Virginia,"736,221",2018
+Washington,"877,244",2018
+West Virginia,"321,009",2018
+Wisconsin,"652,885",2018
+Wyoming,"29,330",2018
+Guam,"44,974",2018
+U.S. Virgin Islands,"32,833",2018
+United States,"35,702,472",2019
+Alabama,"667,043",2019
+Alaska,"78,932",2019
+Arizona,"736,883",2019
+Arkansas,"354,917",2019
+California,"3,529,470",2019
+Colorado,"415,289",2019
+Connecticut,"340,447",2019
+Delaware,"119,787",2019
+District of Columbia,"101,230",2019
+Florida,"2,649,741",2019
+Georgia,"1,332,536",2019
+Hawaii,"144,922",2019
+Idaho,"135,922",2019
+Illinois,"1,639,396",2019
+Indiana,"530,384",2019
+Iowa,"295,682",2019
+Kansas,"185,329",2019
+Kentucky,"502,241",2019
+Louisiana,"749,560",2019
+Maine,"144,433",2019
+Maryland,"570,444",2019
+Massachusetts,"703,516",2019
+Michigan,"1,181,972",2019
+Minnesota,"381,779",2019
+Mississippi,"420,873",2019
+Missouri,"639,338",2019
+Montana,"99,368",2019
+Nebraska,"148,768",2019
+Nevada,"391,569",2019
+New Hampshire,"70,412",2019
+New Jersey,"649,128",2019
+New Mexico,"415,161",2019
+New York,"2,661,700",2019
+North Carolina,"1,228,424",2019
+North Dakota,"45,312",2019
+Ohio,"1,273,257",2019
+Oklahoma,"531,728",2019
+Oregon,"554,927",2019
+Pennsylvania,"1,627,640",2019
+Rhode Island,"141,232",2019
+South Carolina,"558,722",2019
+South Dakota,"75,020",2019
+Tennessee,"832,130",2019
+Texas,"3,187,238",2019
+Utah,"160,829",2019
+Vermont,"68,277",2019
+Virginia,"654,882",2019
+Washington,"833,128",2019
+West Virginia,"282,662",2019
+Wisconsin,"572,323",2019
+Wyoming,"24,309",2019
+Guam,"40,930",2019
+U.S. Virgin Islands,"21,331",2019
+United States,"39,878,685",2020
+Alabama,"730,708",2020
+Alaska,"83,194",2020
+Arizona,"833,448",2020
+Arkansas,"393,091",2020
+California,"4,312,002",2020
+Colorado,"483,097",2020
+Connecticut,"372,305",2020
+Delaware,"120,416",2020
+District of Columbia,"116,406",2020
+Florida,"3,177,286",2020
+Georgia,"1,565,935",2020
+Hawaii,"165,418",2020
+Idaho,"146,497",2020
+Illinois,"1,869,977",2020
+Indiana,"601,417",2020
+Iowa,"310,564",2020
+Kansas,"200,443",2020
+Kentucky,"555,425",2020
+Louisiana,"830,750",2020
+Maine,"159,995",2020
+Maryland,"700,979",2020
+Massachusetts,"821,254",2020
+Michigan,"1,254,475",2020
+Minnesota,"409,275",2020
+Mississippi,"429,568",2020
+Missouri,"715,447",2020
+Montana,"104,391",2020
+Nebraska,"157,091",2020
+Nevada,"448,688",2020
+New Hampshire,"72,505",2020
+New Jersey,"700,538",2020
+New Mexico,"468,745",2020
+New York,"2,658,439",2020
+North Carolina,"1,317,566",2020
+North Dakota,"46,092",2020
+Ohio,"1,396,860",2020
+Oklahoma,"596,705",2020
+Oregon,"635,485",2020
+Pennsylvania,"1,794,613",2020
+Rhode Island,"146,183",2020
+South Carolina,"596,161",2020
+South Dakota,"78,245",2020
+Tennessee,"868,936",2020
+Texas,"3,551,011",2020
+Utah,"164,041",2020
+Vermont,"68,568",2020
+Virginia,"730,370",2020
+Washington,"870,997",2020
+West Virginia,"306,218",2020
+Wisconsin,"647,376",2020
+Wyoming,"26,928",2020
+Guam,"44,041",2020
+U.S. Virgin Islands,"22,520",2020
