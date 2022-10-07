@@ -118,6 +118,8 @@ file_pm2.5 <- list.files(path = "./exposure_data", pattern="daily_88101", full.n
 
 ```{r}
 # data cleaning for socio economic factors
+
+# data cleaning for socio economic factors
 homeless <-  read_csv('homelessness.csv') 
 snap<- read_csv('SNAPenrollment.csv')
 unrate <- read_csv('unemploymentrate.csv')
@@ -127,30 +129,37 @@ poverty <- read.csv('poverty_gender.csv')
 
 ```{r}
 states_vector <- c(unique(homeless$Location), unique(poverty$Location), unique(snap$Location), unique(unrate$State))
-states_vector
+#states_vector
 
 unique_states <- intersect(unique(homeless$Location), unique(poverty$Location))
 unique_states<- intersect(unique_states, unique(snap$Location))
 unique_states <- intersect(unique_states, unique(unrate$State))
-
+unique_states
 ```
-
 
 
 ```{r}
 names(unrate)[names(unrate) == 'State'] <- 'Location'
-```
-
-
-```{r}
 one<-merge(homeless, unrate, by = c('Location', 'year'))
 two <- merge(snap, one, by= c('Location', 'year'))
 soecon <- merge(two, poverty, by = c('Location', 'year'))
 names(soecon)[names(soecon) == 'Individuals'] <- 'individual_homeless'
 names(soecon)[names(soecon) == 'Total People Experiencing Homelessness'] <- 'total_homeless'
 names(soecon)[names(soecon) == 'People in Families with Children'] <- 'fam_homeless'
+soecon$SNAP <- as.numeric(gsub(",", "", soecon$SNAP))/10000
+soecon$individual_homeless <- as.numeric(soecon$individual_homeless) /10000
+soecon$fam_homeless <- as.numeric(soecon$fam_homeless)/10000
+soecon$total_homeless <- as.numeric(soecon$total_homeless)/10000
+
 
 ```
+
+```{r}
+#write.csv(soecon,'soecon.csv')
+```
+
+
+
 
 
 ```{r}
