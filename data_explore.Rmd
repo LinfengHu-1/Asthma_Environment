@@ -153,8 +153,6 @@ plot(fulldat$Asthmap ~ fulldat$no2_mean, ylab = "Asthma Pervalence", xlab = expr
 ```{r}
 pairs(o3_mean ~ pm2.5_mean + so2_mean + co_mean + no2_mean, data = fulldat)
 ```
-<<<<<<< HEAD
->>>>>>> 6e98b540ba43e672cb60c0ef0d4f92ae0bfda457
 
 
 ```{r}
@@ -163,5 +161,4 @@ pairs(Asthmap ~ total_homeless + SNAP + unemployment_rate + Total_poverty, dat =
 
 ```
 from the paired scatterplot, 
-=======
->>>>>>> 2a01f8eafab5a8d1573b7d03f3fd584282ddae90
+
