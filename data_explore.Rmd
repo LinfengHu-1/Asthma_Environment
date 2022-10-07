@@ -69,15 +69,23 @@ pairs(soecon$Total_poverty ~ soecon$individual_homeless + soecon$fam_homeless)
 ```
 
 ```{r}
+fulldat <- read_csv('FullData.csv')
+names(fulldat)[names(fulldat) == 'DataValue'] <- 'Asthmap'
+names(fulldat)[names(fulldat) == 'TOBDataValue'] <- 'TOB'
 
-# now we try to determine which variable is more significant in predicting the 
+
+# now we try to determine which variable is more significant in predicting the Asthma prevalence
 # forward selection
-#coln <- colnames(dat_exp)
-#require(broom)
+coln <- colnames(fulldat)
+
+coln
+fulldat <- fulldat |> drop_na()
+
+require(broom)
 #forward selection procedure using AIC values 
-#lm1 <- lm(tc ~ 1, data=dat)
-#stepModel <- step(lm1, direction="forward",
-#scope=(~ bmi + I(bmi ^2) + age + female + female * age + I(age ^2)+ female * I(age ^2)), data=ss)
+lm1 <- lm(Asthmap ~ 1, data=fulldat)
+stepModel <- step(lm1, direction="forward",
+scope=(~ AlcHeavyDataValue + AlcBingeDataValue + ObeDataValue + selfHlthDataValue + HlthCareDataValue + SNAP+ individual_homeless+fam_homeless+total_homeless+unemployment_rate+Male_poverty+Female_poverty+Total_poverty+o3_mean+pm2.5_mean+so2_mean+co_mean+no2_mean), data=fulldat)
 
 ```
 
