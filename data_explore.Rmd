@@ -92,39 +92,53 @@ scope=(~ selfHlthDataValue + HlthCareDataValue + SNAP+ individual_homeless+fam_h
 
 ```
 
-<<<<<<< HEAD
 
 #### CDI data
 ```{r}
-names(dat_full[, 1:25])
+names(fulldat[, 1:25])
 ```
 ```{r}
-dat_full <- read.csv("FullData.csv")
-summary(dat_full[, 4:25])
+summary(fulldat[, 4:25])
 ```
 ```{r}
-hist(dat_full$DataValue, main='Histogram of asthma crude prevalence among women aged 18-44 years across states' )
-hist(dat_full$TOBDataValue, main='Histogram of Percent current cigarette smoking among women aged 18-44 years across states')
-hist(dat_full$selfHlthDataValue, main = 'Histogram of Self-rated health status among women aged 18-44 years across states')
+par(mfrow = c(2,2))
+hist(fulldat$Asthmap, main='Histogram of asthma crude prevalence 
+     among women aged 18-44 years across states')
+hist(fulldat$TOB, main='Histogram of Percent current cigarette smoking 
+     among women aged 18-44 years across states')
+hist(fulldat$selfHlthDataValue, main = 'Histogram of Self-rated health status 
+     among women aged 18-44 years across states')
+hist(fulldat$HlthCareDataValue, main = 'Histogram of Current health care coverage 
+     among women aged 18-44 years across states')
+```
+
+
+```{r}
+pairs(TOB ~ selfHlthDataValue + HlthCareDataValue, data = fulldat)
+```
+We can see here that there's no obvious co-linearity between our covariates.
+```{r}
+#CDI exploratory
+par(mfrow = c(3,1))
+plot(fulldat$Asthmap ~ fulldat$TOB, ylab = "Asthma Pervalence", xlab = "Tobacco smoked")
+plot(fulldat$Asthmap ~ fulldat$selfHlthDataValue,ylab = "Asthma Pervalence", xlab = "self-reported health status")
+plot(fulldat$Asthmap ~ fulldat$HlthCareDataValue,ylab = "Asthma Pervalence", xlab = "healthcare coverage")
 ```
 
 
 
-
-
-
-
+#### Air pollution data
 ```{r}
 #air pollutant exploratory
 
 par(mfrow = c(3,2))
-plot(dat_full$DataValue ~ dat_full$o3_mean, ylab = "Asthma Pervalence", xlab = expression(O[3]~(ppm)))
-plot(dat_full$DataValue ~ dat_full$pm2.5_mean,ylab = "Asthma Pervalence", xlab = expression(PM[2.5]~(ug/m^3)))
-plot(dat_full$DataValue ~ dat_full$so2_mean,ylab = "Asthma Pervalence", xlab = expression(SO[2]~(ppb)))
-plot(dat_full$DataValue ~ dat_full$co_mean, ylab = "Asthma Pervalence", xlab = "CO (ppm)")
-plot(dat_full$DataValue ~ dat_full$no2_mean, ylab = "Asthma Pervalence", xlab = expression(NO[2]~(ppb)))
+plot(fulldat$Asthmap ~ fulldat$o3_mean, ylab = "Asthma Pervalence", xlab = expression(O[3]~(ppm)))
+plot(fulldat$Asthmap ~ fulldat$pm2.5_mean,ylab = "Asthma Pervalence", xlab = expression(PM[2.5]~(ug/m^3)))
+plot(fulldat$Asthmap ~ fulldat$so2_mean,ylab = "Asthma Pervalence", xlab = expression(SO[2]~(ppb)))
+plot(fulldat$Asthmap ~ fulldat$co_mean, ylab = "Asthma Pervalence", xlab = "CO (ppm)")
+plot(fulldat$Asthmap ~ fulldat$no2_mean, ylab = "Asthma Pervalence", xlab = expression(NO[2]~(ppb)))
 ```
 
 ```{r}
-pairs(o3_mean ~ pm2.5_mean + so2_mean + co_mean + no2_mean, data = dat_full)
+pairs(o3_mean ~ pm2.5_mean + so2_mean + co_mean + no2_mean, data = fulldat)
 ```
