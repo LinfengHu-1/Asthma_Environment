@@ -40,20 +40,30 @@ summary(soecon)
 
 Draw histograms of the variables in the dataset
 ```{r}
+par(mfrow = c(2,2))
+hist(soecon$SNAP, main='SNAP enrollment across states', xlab = 'per 10,000 people' )
+hist(log(soecon$SNAP))
 
-hist(soecon$SNAP, main='Histogram of SNAP enrollment across states', xlab = 'per 10,000 people' )
+hist(soecon$individual_homeless, main = 'Homeless individuals across states', xlab = 'per 10,000 people')
+hist(log(soecon$individual_homeless))
 
-hist(soecon$individual_homeless, main = 'Histogram of homeless individuals across states', xlab = 'per 10,000 people')
+hist(soecon$fam_homeless, main = 'Homeless in families across states', xlab = 'per 10,000 people')
+hist(log(soecon$fam_homeless))
 
-hist(soecon$fam_homeless, main = 'Histogram of homeless in families across states', xlab = 'per 10,000 people')
+hist(soecon$total_homeless, main = 'Total homeless across states ', xlab = 'per 10,000 people')
+hist(log(soecon$total_homeless))
 
-hist(soecon$total_homeless, main = 'Histogram of total homeless people across states ', xlab = 'per 10,000 people')
+hist(soecon$unemployment_rate, main='Unemployment rate across states', xlab = 'unemployment rate')
 
-hist(soecon$unemployment_rate, main='Histogram of unemployment rate across states', xlab = 'unemployment rate')
 
-hist(soecon$Female_poverty, main='Histogram of female poverty percentage across states', xlab = 'percentage of total female population')
+hist(soecon$Total_poverty, main='Total poverty across states', xlab = 'percentage of total population')
 
 ```
+
+based on the histograms, most of the variables have skewed distribution, but after taking the logarithms of them, they tend to have more normal distribution. This is because most of the variables are population data, and the population values are big, but after taking the logarithms, the values will be more normally distributed.
+
+
+
 ```{r}
 pairs(soecon$total_homeless ~ soecon$SNAP + soecon$unemployment_rate + soecon$Total_poverty )
 ```
@@ -64,10 +74,12 @@ Based on the paired scatter plot, there is no obvious colinearity between the fo
 # for the homeless variable, test for colinearity between its three subvariables 
 pairs(soecon$total_homeless ~ soecon$individual_homeless + soecon$fam_homeless)
 ```
+from the paired scatter plot, we can see that the total number of homeless people is correlated with number os homeless individuals and the number of homeless people in families, so these three variables are not independent with each other.
 ```{r}
 # for the homeless variable, test for colinearity between its three subvariables 
-pairs(soecon$Total_poverty ~ soecon$individual_homeless + soecon$fam_homeless)
+pairs(soecon$Total_poverty ~ soecon$Male_poverty + soecon$Female_poverty)
 ```
+By plotting the percentage of males and females that are in poverty in each state against each other, we can see that these variables are linearly correlated with each other and are not independent. 
 
 ```{r}
 fulldat <- read_csv('FullData.csv')
@@ -133,3 +145,11 @@ plot(dat_full$DataValue ~ dat_full$no2_mean, ylab = "Asthma Pervalence", xlab = 
 pairs(o3_mean ~ pm2.5_mean + so2_mean + co_mean + no2_mean, data = dat_full)
 ```
 >>>>>>> 6e98b540ba43e672cb60c0ef0d4f92ae0bfda457
+
+
+```{r}
+# analysis of Asthma Pervalence and socioeconomic variables 
+pairs(Asthmap ~ total_homeless + SNAP + unemployment_rate + Total_poverty, dat = fulldat)
+
+```
+from the paired scatterplot, 
