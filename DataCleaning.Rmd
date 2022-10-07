@@ -1,0 +1,326 @@
+---
+title: "BST210_DataCleaning"
+date: "2022-10-04"
+output: html_document
+---
+
+```{r pressure, echo=FALSE}
+library(rstudioapi)
+library(tidyverse)
+library(gam)
+library(splines)
+library(splines2)  
+library(dplyr)
+library(tidyr)
+library(broom)
+library(dslabs)
+library(ggplot2)
+library(ggthemes)
+library(ggrepel)
+library(data.table)
+```
+
+## Data Cleaning
+
+#### CDI data 
+Choose target group to be "women aged 18-44 years" for age and gender restricted data
+Crude prevalence
+```{r}
+#Asthma prevalence among women aged 18-44 years
+dat_asthma <- read.csv("CDI_Asthma.csv") |> filter(QuestionID=="AST1_2", StratificationID1 == "OVR")
+
+#Current cigarette smoking among women aged 18-44 years - Crude Prevalence
+dat_smk <- read.csv("CDI_Tobacco.csv")|> filter(QuestionID == "TOB1_3", StratificationID1 == "OVR")
+
+#Heavy drinking among women aged 18-44 years: QuestionID = ALC5_2
+dat_heavyDrink <- read.csv("CDI_Alcohol.csv") |> filter(QuestionID == "ALC5_2", StratificationID1 == "OVR")
+#Binge drinking prevalence among women aged 18-44 years: QuestionID = ALC2_3
+dat_bingeDrink <- read.csv("CDI_Alcohol.csv") |> filter(QuestionID == "ALC2_3", StratificationID1 == "OVR")
+
+#Obesity data: Overweight or obesity among women aged 18-44 years - Crude Prevalence
+dat_obe <- read.csv("CDI_Obesity.csv")|> filter(QuestionID == "NPAW2_3", StratificationID1 == "OVR")
+
+#Self-rated health status among women aged 18-44 years: OVC6_2
+dat_selfHlthSta <- read.csv("CDI_Overarching.csv")|> filter(QuestionID == "OVC6_2", StratificationID1 == "OVR")
+#Current health care coverage among women aged 18-44 years: OVC1_2
+dat_HlthCare <- read.csv("CDI_Overarching.csv")|> filter(QuestionID == "OVC1_2", StratificationID1 == "OVR")
+
+#merge asthma with the 7 covariate dataframes
+#function to drop unnecessary columns
+prep.CDI.merge <- function(x) {
+    x <- x[c("YearStart", "LocationAbbr", "DataValue", "LowConfidenceLimit", "HighConfidenceLimit")]
+    return (x)}
+dat_smk <- prep.CDI.merge(dat_smk)
+colnames(dat_smk) <- c("YearStart", "LocationAbbr", "TOBDataValue", "TOBLowConfidenceLimit", "TOBHighConfidenceLimit")
+dat_heavyDrink <- prep.CDI.merge(dat_heavyDrink)
+colnames(dat_heavyDrink) <- c("YearStart", "LocationAbbr", "AlcHeavyDataValue", "AlcHeavyLowConfidenceLimit", "AlcHeavyHighConfidenceLimit")
+dat_bingeDrink <- prep.CDI.merge(dat_bingeDrink)
+colnames(dat_bingeDrink) <- c("YearStart", "LocationAbbr", "AlcBingeDataValue",  "AlcBingeLowConfidenceLimit", "AlcBingeHighConfidenceLimit")
+dat_obe <- prep.CDI.merge(dat_obe)
+colnames(dat_obe) <- c("YearStart", "LocationAbbr", "ObeDataValue", "ObeLowConfidenceLimit", "ObeHighConfidenceLimit")
+dat_selfHlthSta <- prep.CDI.merge(dat_selfHlthSta)
+colnames(dat_selfHlthSta) <- c("YearStart", "LocationAbbr", "selfHlthDataValue", "selfHlthLowConfidenceLimit", "selfHlthHighConfidenceLimit")
+dat_HlthCare <- prep.CDI.merge(dat_HlthCare)
+colnames(dat_HlthCare) <- c("YearStart", "LocationAbbr", "HlthCareDataValue",  "HlthCareLowConfidenceLimit", "HlthCareHighConfidenceLimit")
+
+CDI_cov_list <- list(dat_asthma, dat_smk, dat_heavyDrink, dat_bingeDrink, dat_obe, dat_selfHlthSta, dat_HlthCare) 
+
+dat_mergeCDI <- CDI_cov_list %>% reduce(full_join, by = c("YearStart", "LocationAbbr"))
+#sort dataframe by year & drop colums with only NAs
+dat_mergeCDI <- dat_mergeCDI[order(dat_mergeCDI$YearStart, decreasing = FALSE),] |> select_if(~sum(!is.na(.)) > 0) |> filter(YearStart!="2020")
+dat_mergeCDI <- subset(dat_mergeCDI, select= -c(2,5:9,11:13, 16:17, 19:23))
+```
+
+
+#### Air pollutant data
+Clean Daily Summary data to obtain annual average by state from 2011 to 2019 (Ozone, SO2, CO, NO2)
+```{r}
+#exposure variables defined as percentage of AQI days with co, no2, o3, pm2.5, pm10 as primary pollutants
+# naming pattern: Ozone (44201)	SO2 (42401)	CO (42101)	NO2 (42602) PM2.5 FRM/FEM Mass (88101)
+
+#Ozone unit: parts per million--------------------
+#read in daily summary file - O3
+file_o3 <- list.files(path = "./exposure_data", pattern="daily_44201", full.names =T)
+dat_o3_tibble <- lapply(file_o3, read.csv)
+
+#read in files of land area of U.S. counties
+# LND110210D Land area in square miles 2010
+land_area <- readxl::read_xls("LND01.xls") %>% select(Areaname, STCOU, LND110210D) %>% 
+  mutate(State.Code = substr(STCOU, start = 1, stop = 2),
+         County.Code = substr(STCOU, start = 3, stop = 5)) %>% subset(County.Code != "000") %>% 
+  rename(land.area = LND110210D) %>% select(State.Code, County.Code, land.area)
+
+land_area$State.Code <-  gsub("(?<![0-9])0+", "", land_area$State.Code, perl = TRUE) %>% as.integer()
+land_area$County.Code <- gsub("(?<![0-9])0+", "", land_area$County.Code, perl = TRUE) %>% as.integer()
+
+
+#create function to find the annual average of ozone exposure by state
+find.state.annual.o3 <- function(x) {
+  annual.mean <- x %>% group_by(State.Code, County.Code) %>% mutate(o3 = mean(Arithmetic.Mean)) %>% 
+    left_join(land_area, by = c("State.Code", "County.Code")) %>% ungroup() %>% 
+    group_by(State.Code) %>% summarise(o3_mean = weighted.mean(o3, land.area))
+
+  return(annual.mean)
+}
+
+dat_o3_tibble_mean <- lapply(dat_o3_tibble, find.state.annual.o3)
+
+for (i in 1:length(dat_o3_tibble_mean)){
+  dat_o3_tibble_mean[[i]] <- dat_o3_tibble_mean[[i]] %>% mutate(year = i + 2010)
+}
+
+dat_o3 <- rbindlist(dat_o3_tibble_mean, use.names = TRUE, fill = TRUE)
+
+
+#pm2.5 unit: microgram/cubic meter-----------------
+file_pm2.5 <- list.files(path = "./exposure_data", pattern="daily_88101", full.names =T)
+```
+
+```{r}
+# data cleaning for socio economic factors
+homeless <-  read_csv('homelessness.csv') 
+snap<- read_csv('SNAPenrollment.csv')
+unrate <- read_csv('unemploymentrate.csv')
+poverty <- read.csv('poverty_gender.csv')
+
+```
+
+```{r}
+states_vector <- c(unique(homeless$Location), unique(poverty$Location), unique(snap$Location), unique(unrate$State))
+states_vector
+
+unique_states <- intersect(unique(homeless$Location), unique(poverty$Location))
+unique_states<- intersect(unique_states, unique(snap$Location))
+unique_states <- intersect(unique_states, unique(unrate$State))
+
+```
+
+
+
+```{r}
+names(unrate)[names(unrate) == 'State'] <- 'Location'
+```
+
+
+```{r}
+one<-merge(homeless, unrate, by = c('Location', 'year'))
+two <- merge(snap, one, by= c('Location', 'year'))
+soecon <- merge(two, poverty, by = c('Location', 'year'))
+names(soecon)[names(soecon) == 'Individuals'] <- 'individual_homeless'
+names(soecon)[names(soecon) == 'Total People Experiencing Homelessness'] <- 'total_homeless'
+names(soecon)[names(soecon) == 'People in Families with Children'] <- 'fam_homeless'
+
+```
+
+
+```{r}
+dat_pm2.5_tibble <- lapply(file_pm2.5, read.csv)
+
+#read in files of land area of U.S. counties
+# LND110210D Land area in square miles 2010
+land_area <- readxl::read_xls("LND01.xls") %>% select(Areaname, STCOU, LND110210D) %>% 
+  mutate(State.Code = substr(STCOU, start = 1, stop = 2),
+         County.Code = substr(STCOU, start = 3, stop = 5)) %>% subset(County.Code != "000") %>% 
+  rename(land.area = LND110210D) %>% select(State.Code, County.Code, land.area)
+
+land_area$State.Code <-  gsub("(?<![0-9])0+", "", land_area$State.Code, perl = TRUE) %>% as.integer()
+land_area$County.Code <- gsub("(?<![0-9])0+", "", land_area$County.Code, perl = TRUE) %>% as.integer()
+
+
+#create function to find the annual average of pm2.5 exposure by state
+find.state.annual.pm2.5 <- function(x) {
+  annual.mean <- x %>% group_by(State.Code, County.Code) %>% mutate(pm2.5 = mean(Arithmetic.Mean)) %>% 
+    left_join(land_area, by = c("State.Code", "County.Code")) %>% ungroup() %>% 
+    group_by(State.Code) %>% summarise(pm2.5_mean = weighted.mean(pm2.5, land.area))
+
+  return(annual.mean)
+}
+
+dat_pm2.5_tibble_mean <- lapply(dat_pm2.5_tibble, find.state.annual.pm2.5)
+
+for (i in 1:length(dat_pm2.5_tibble_mean)){
+  dat_pm2.5_tibble_mean[[i]] <- dat_pm2.5_tibble_mean[[i]] %>% mutate(year = i + 2010)
+}
+
+dat_pm2.5 <- rbindlist(dat_pm2.5_tibble_mean, use.names = TRUE, fill = TRUE)
+
+#SO2 unit: parts per billion-----------------
+file_so2 <- list.files(path = "./exposure_data", pattern="daily_42401", full.names =T)
+
+dat_so2_tibble <- lapply(file_so2, read.csv)
+
+#create function to find the annual average of pm2.5 exposure by state
+find.state.annual.so2 <- function(x) {
+  annual.mean <- x %>% group_by(State.Code, County.Code) %>% mutate(so2 = mean(Arithmetic.Mean)) %>% 
+    left_join(land_area, by = c("State.Code", "County.Code")) %>% ungroup() %>% 
+    group_by(State.Code) %>% summarise(so2_mean = weighted.mean(so2, land.area))
+
+  return(annual.mean)
+}
+
+dat_so2_tibble_mean <- lapply(dat_so2_tibble, find.state.annual.so2)
+
+for (i in 1:length(dat_so2_tibble_mean)){
+  dat_so2_tibble_mean[[i]] <- dat_so2_tibble_mean[[i]] %>% mutate(year = i + 2010)
+}
+
+dat_so2 <- rbindlist(dat_so2_tibble_mean, use.names = TRUE, fill = TRUE)
+
+#CO unit: parts per million-----------------
+file_co <- list.files(path = "./exposure_data", pattern="daily_42101", full.names =T)
+
+dat_co_tibble <- lapply(file_co, read.csv)
+
+#create function to find the annual average of pm2.5 exposure by state
+find.state.annual.co <- function(x) {
+  annual.mean <- x %>% group_by(State.Code, County.Code) %>% mutate(co = mean(Arithmetic.Mean)) %>% 
+    left_join(land_area, by = c("State.Code", "County.Code")) %>% ungroup() %>% 
+    group_by(State.Code) %>% summarise(co_mean = weighted.mean(co, land.area))
+
+  return(annual.mean)
+}
+
+dat_co_tibble_mean <- lapply(dat_co_tibble, find.state.annual.co)
+
+for (i in 1:length(dat_co_tibble_mean)){
+  dat_co_tibble_mean[[i]] <- dat_co_tibble_mean[[i]] %>% mutate(year = i + 2010)
+}
+
+dat_co <- rbindlist(dat_co_tibble_mean, use.names = TRUE, fill = TRUE)
+
+
+#NO2 unit: parts per billion --------------------
+#read in daily summary file - no2
+file_no2 <- list.files(path = "./exposure_data", pattern="daily_42602", full.names =T)
+dat_no2_tibble <- lapply(file_no2, read.csv)
+
+#create function to find the annual average of ozone exposure by state
+find.state.annual.no2 <- function(x) {
+  annual.mean <- x %>% group_by(State.Code, County.Code) %>% mutate(no2 = mean(Arithmetic.Mean)) %>% 
+    left_join(land_area, by = c("State.Code", "County.Code")) %>% ungroup() %>% 
+    group_by(State.Code) %>% summarise(no2_mean = weighted.mean(no2, land.area))
+
+  return(annual.mean)
+}
+
+dat_no2_tibble_mean <- lapply(dat_no2_tibble, find.state.annual.no2)
+
+for (i in 1:length(dat_no2_tibble_mean)){
+  dat_no2_tibble_mean[[i]] <- dat_no2_tibble_mean[[i]] %>% mutate(year = i + 2010)
+}
+
+dat_no2 <- rbindlist(dat_no2_tibble_mean, use.names = TRUE, fill = TRUE)
+
+
+dat_exp <- dat_o3 %>% left_join(dat_pm2.5, by = c("State.Code","year")) %>% left_join(dat_so2, by = c("State.Code","year")) %>% 
+  left_join(dat_co, by = c("State.Code","year")) %>% left_join(dat_no2, by = c("State.Code","year"))
+
+st_crosswalk <- unique(dat_o3_tibble[[1]][,c('State.Code','State.Name')])
+
+dat_exp <- dat_exp %>% filter(year != 2020) %>% left_join(st_crosswalk, by = c("State.Code"))
+
+
+```
+
+#### Socioeconomic data
+
+```{r}
+# data cleaning for socio economic factors
+homeless <-  read_csv('homelessness.csv') 
+snap<- read_csv('SNAPenrollment.csv')
+unrate <- read_csv('unemploymentrate.csv')
+poverty <- read.csv('poverty_gender.csv')
+
+```
+
+```{r}
+states_vector <- c(unique(homeless$Location), unique(poverty$Location), unique(snap$Location), unique(unrate$State))
+states_vector
+
+unique_states <- intersect(unique(homeless$Location), unique(poverty$Location))
+unique_states<- intersect(unique_states, unique(snap$Location))
+unique_states <- intersect(unique_states, unique(unrate$State))
+```
+
+
+```{r}
+one<-merge(homeless, unrate, by = c('Location', 'year'))
+two <- merge(snap, one, by= c('Location', 'year'))
+soecon <- merge(two, poverty, by = c('Location', 'year'))
+names(soecon)[names(soecon) == 'Individuals'] <- 'individual_homeless'
+names(soecon)[names(soecon) == 'Total People Experiencing Homelessness'] <- 'total_homeless'
+names(soecon)[names(soecon) == 'People in Families with Children'] <- 'fam_homeless'
+
+```
+
+
+```{r}
+unique(soecon$Location)
+```
+```{r}
+dat_full <- dat_mergeCDI %>% left_join(soecon, by = c("LocationDesc" = "Location", "YearStart" = "year")) %>% 
+  left_join(dat_exp, by = c("LocationID" = "State.Code", "YearStart" = "year"))
+
+find.na <- dat_full %>% select(LocationDesc, State.Name) %>% unique()
+dat_full <- dat_full |> filter(State.Name!="United States" & State.Name!="Virgin Islands")
+```
+
+
+#### Exploratory Analysis
+```{r}
+library(leaps) 
+library(foreign) 
+library(broom) 
+library(plm)
+```
+```{r}
+names(dat_full)
+```
+
+```{r}
+par(mfrow=c(3,6))
+hist(dat_full$DataValue.x)
+hist(dat_full$TOBDataValue)
+hist(dat_full$HlthCareDataValue)
+hist(dat_full$DataValue.x.x)
+```

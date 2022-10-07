@@ -1,0 +1,81 @@
+---
+title: "data_exploration"
+author: "Pluto Zhang"
+date: "2022-10-07"
+output: pdf_document
+---
+
+```{r}
+library(rstudioapi)
+library(tidyverse)
+library(gam)
+library(splines)
+library(splines2)  
+library(dplyr)
+library(tidyr)
+library(broom)
+library(dslabs)
+library(ggplot2)
+library(ggthemes)
+library(ggrepel)
+# data cleaning for socio economic factors
+homeless <-  read_csv('homelessness.csv') 
+snap<- read_csv('SNAPenrollment.csv')
+unrate <- read_csv('unemploymentrate.csv')
+poverty <- read.csv('poverty_gender.csv')
+
+```
+
+```{r}
+states_vector <- c(unique(homeless$Location), unique(poverty$Location), unique(snap$Location), unique(unrate$State))
+states_vector
+
+unique_states <- intersect(unique(homeless$Location), unique(poverty$Location))
+unique_states<- intersect(unique_states, unique(snap$Location))
+unique_states <- intersect(unique_states, unique(unrate$State))
+
+```
+
+
+
+```{r}
+names(unrate)[names(unrate) == 'State'] <- 'Location'
+```
+
+
+```{r}
+one<-merge(homeless, unrate, by = c('Location', 'year'))
+two <- merge(snap, one, by= c('Location', 'year'))
+soecon <- merge(two, poverty, by = c('Location', 'year'))
+names(soecon)[names(soecon) == 'Individuals'] <- 'individual_homeless'
+names(soecon)[names(soecon) == 'Total People Experiencing Homelessness'] <- 'total_homeless'
+names(soecon)[names(soecon) == 'People in Families with Children'] <- 'fam_homeless'
+
+```
+
+```{r}
+# Let's load libraries and data
+library(DAAG)
+library(glmnet)
+library(leaps)
+library(StepReg)
+library(splines2)
+library(foreign)
+library(gam)
+library(Hmisc)
+library(broom)
+library(caret)
+library(vip)
+library(plm)
+#dat_exp <- read_csv()
+# forward selection
+#coln <- colnames(dat_exp)
+#require(broom)
+#forward selection procedure using AIC values 
+#lm1 <- lm(tc ~ 1, data=dat)
+#stepModel <- step(lm1, direction="forward",
+#scope=(~ bmi + I(bmi ^2) + age + female + female * age + I(age ^2)+ female * I(age ^2)), data=ss)
+
+```
+
+
