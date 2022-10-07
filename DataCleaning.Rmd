@@ -266,7 +266,7 @@ dat_exp <- dat_exp %>% filter(year != 2020) %>% left_join(st_crosswalk, by = c("
 
 ```{r}
 # data cleaning for socio economic factors
-homeless <-  read_csv('homelessness.csv') 
+homeless <-  read_csv("homelessness.csv") 
 snap<- read_csv('SNAPenrollment.csv')
 unrate <- read_csv('unemploymentrate.csv')
 poverty <- read.csv('poverty_gender.csv')
@@ -284,7 +284,7 @@ unique_states <- intersect(unique_states, unique(unrate$State))
 
 
 ```{r}
-one<-merge(homeless, unrate, by = c('Location', 'year'))
+one<- merge(homeless, unrate, by = c("Location" = "State", "year"= "year"))
 two <- merge(snap, one, by= c('Location', 'year'))
 soecon <- merge(two, poverty, by = c('Location', 'year'))
 names(soecon)[names(soecon) == 'Individuals'] <- 'individual_homeless'
@@ -299,6 +299,7 @@ unique(soecon$Location)
 ```
 ```{r}
 dat_exp <- read.csv("dat_exp.csv")
+soecon <- read.csv()
 dat_full <- dat_mergeCDI %>% left_join(soecon, by = c("LocationDesc" = "Location", "YearStart" = "year")) %>% 
   left_join(dat_exp, by = c("LocationID" = "State.Code", "YearStart" = "year"))
 
