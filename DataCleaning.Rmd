@@ -299,7 +299,7 @@ unique(soecon$Location)
 ```
 ```{r}
 dat_exp <- read.csv("dat_exp.csv")
-soecon <- read.csv()
+soecon <- read.csv("soecon.csv")
 dat_full <- dat_mergeCDI %>% left_join(soecon, by = c("LocationDesc" = "Location", "YearStart" = "year")) %>% 
   left_join(dat_exp, by = c("LocationID" = "State.Code", "YearStart" = "year"))
 
