@@ -2,7 +2,9 @@
 title: "data_exploration"
 author: "Pluto Zhang"
 date: "2022-10-07"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r}
@@ -110,26 +112,19 @@ hist(dat_full$selfHlthDataValue, main = 'Histogram of Self-rated health status a
 
 
 
-=======
-```{r}
-par(mfrow=c(3,6))
-hist(dat_full$DataValue.x)
-hist(dat_full$TOBDataValue)
-hist(dat_full$HlthCareDataValue)
-hist(dat_full$DataValue.x.x)
-```
 
 
 ```{r}
 #air pollutant exploratory
 
 par(mfrow = c(3,2))
-plot(dat_full$DataValue ~ dat_full$o3_mean, ylab = "Asthma Pervalence", xlab = "Ozone")
-plot(dat_full$DataValue ~ dat_full$pm2.5_mean,ylab = "Asthma Pervalence", xlab = "PM2.5")
-plot(dat_full$DataValue ~ dat_full$so2_mean,ylab = "Asthma Pervalence", xlab = "Sulfur Dioxide")
-plot(dat_full$DataValue ~ dat_full$co_mean, ylab = "Asthma Pervalence", xlab = "Carbon Monoxide")
-plot(dat_full$DataValue ~ dat_full$no2_mean, ylab = "Asthma Pervalence", xlab = "Nitrogen Dioxide")
+plot(dat_full$DataValue ~ dat_full$o3_mean, ylab = "Asthma Pervalence", xlab = expression(O[3]~(ppm)))
+plot(dat_full$DataValue ~ dat_full$pm2.5_mean,ylab = "Asthma Pervalence", xlab = expression(PM[2.5]~(ug/m^3)))
+plot(dat_full$DataValue ~ dat_full$so2_mean,ylab = "Asthma Pervalence", xlab = expression(SO[2]~(ppb)))
+plot(dat_full$DataValue ~ dat_full$co_mean, ylab = "Asthma Pervalence", xlab = "CO (ppm)")
+plot(dat_full$DataValue ~ dat_full$no2_mean, ylab = "Asthma Pervalence", xlab = expression(NO[2]~(ppb)))
+```
 
+```{r}
 pairs(o3_mean ~ pm2.5_mean + so2_mean + co_mean + no2_mean, data = dat_full)
 ```
->>>>>>> 6e98b540ba43e672cb60c0ef0d4f92ae0bfda457
