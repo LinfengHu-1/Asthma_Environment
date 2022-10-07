@@ -119,7 +119,6 @@ pairs(TOB ~ selfHlthDataValue + HlthCareDataValue, data = fulldat)
 We can see here that there's no obvious co-linearity between our covariates.
 ```{r}
 #CDI exploratory
-par(mfrow = c(3,1))
 plot(fulldat$Asthmap ~ fulldat$TOB, ylab = "Asthma Pervalence", xlab = "Tobacco smoked")
 plot(fulldat$Asthmap ~ fulldat$selfHlthDataValue,ylab = "Asthma Pervalence", xlab = "self-reported health status")
 plot(fulldat$Asthmap ~ fulldat$HlthCareDataValue,ylab = "Asthma Pervalence", xlab = "healthcare coverage")
