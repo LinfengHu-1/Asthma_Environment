@@ -85,7 +85,7 @@ require(broom)
 #forward selection procedure using AIC values 
 lm1 <- lm(Asthmap ~ 1, data=fulldat)
 stepModel <- step(lm1, direction="forward",
-scope=(~ AlcHeavyDataValue + AlcBingeDataValue + ObeDataValue + selfHlthDataValue + HlthCareDataValue + SNAP+ individual_homeless+fam_homeless+total_homeless+unemployment_rate+Male_poverty+Female_poverty+Total_poverty+o3_mean+pm2.5_mean+so2_mean+co_mean+no2_mean), data=fulldat)
+scope=(~ selfHlthDataValue + HlthCareDataValue + SNAP+ individual_homeless+fam_homeless+total_homeless+unemployment_rate+Male_poverty+Female_poverty+Total_poverty+o3_mean+pm2.5_mean+so2_mean+co_mean+no2_mean), data=fulldat)
 
 ```
 
