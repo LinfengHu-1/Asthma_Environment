@@ -1,6 +1,6 @@
 ---
 title: "data_exploration"
-author: "Group 21"
+author: "Group number: 21; Group name & members: 'Group 21' (Cynthia Ma, Pluto Zhang, Linfeng Hu)"
 date: "2022-10-07"
 output:
   html_document:
