@@ -1,0 +1,20 @@
+Pluto: I explored the california screening dataset 2018 a lil bit last night and I think it's perfect for analysis :) over 8000 rows, with Asthma rate and Cardiovascular prevalence
+and lots of air pollution factors and 6 socioeconomic factors
+
+I dont think we need to change our written plan much, in terms of the variables
+What we do need to change: 1. from 51 states to 1 state with lots of zip codes. Maybe we should use zip codes as the identifier
+Just one thing to keep in mind and we need to ask her in her OH: HOW DO WE DEAL WITH THE NAs
+There are at most 200ish NAs in one of the columns 
+and 100ish NAs for a few other columns
+When I run the forward selection model they haveto be removed
+
+
+(the AIC is pretty big thou)
+The desired model: 
+Asthma ~ Pop.Char. + LinguisticIsolation + DrinkingWater + CardiovascularDisease + 
+    Ozone + Education + LowBirthWeight + HousingBurden + DieselPM + 
+    Unemployment + Traffic + CleanupSites + Tox.Release + Imp.WaterBodies + 
+    PollutionBurden + PM2.5 + GroundwaterThreats + Haz.Waste
+    
+    
+    
