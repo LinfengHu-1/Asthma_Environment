@@ -3,7 +3,7 @@ title: "data_exploration"
 author: "Group 21"
 date: "2022-10-07"
 output:
-  html_document:
+  word_document:
     df_print: paged
 ---
 
