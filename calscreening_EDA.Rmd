@@ -1,0 +1,129 @@
+---
+title: "calscreening2018"
+author: "Pluto Zhang, Linfeng Hu, Cynthia Ma"
+date: "2022-10-26"
+output: html_document
+---
+
+```{r}
+library(rstudioapi)
+library(tidyverse)
+library(gam)
+library(splines)
+library(splines2)  
+library(dplyr)
+library(tidyr)
+library(broom)
+library(dslabs)
+library(ggplot2)
+library(ggthemes)
+library(ggrepel)
+library(data.table)
+```
+
+```{r}
+data_cal <- read_csv('calenviroscreen-3.0-results-june-2018-update.csv')
+data_cal
+```
+
+
+```{r}
+summary(data_cal)
+```
+
+```{r}
+#names(data_cal)
+colnames(data_cal) <- gsub(" ", "", colnames(data_cal))
+colnames(data_cal) <- gsub("\n", "", colnames(data_cal))
+names(data_cal)
+```
+
+from the summary we can see there are at most 242 NAs 
+
+
+Question: how do we remove NAs? do we need to keep NAs? 
+What about 
+
+*****
+columns for diseases: Asthma LowBirthWeight CardiovascularDisease
+
+columns for socio economic elements:
+ Education LinguisticIsolation Poverty Unemployment HousingBurden Pop.Char.
+
+columns for air pollution elements: 
+Ozone PM2.5 DieselPM DrinkingWater Pesticides Tox.Release
+Traffic CleanupSites GroundwaterThreats Haz.Waste Imp.WaterBodies
+SolidWaste PollutionBurden
+*****
+
+```{r}
+air_pollutants_vec <- names(data_cal)[12:38]
+air_pollutants_vec
+
+
+
+disease_vec <- names(data_cal)[39:44]
+disease_vec
+
+soecon <- names(data_cal)[45:57]
+soecon
+```
+
+# EDA
+
+## EDA for Pollution factors
+```{r}
+
+
+
+#histograms for the air pollution factors
+hist(data_cal$Ozone, main='Histogram of state-level Ozone concentration in the air' )
+
+hist(data_cal$PM2.5, main='Histogram of state-level PM 2.5 concentration in the air' )
+
+hist(data_cal$DieselPM, main='Histogram of state-level Diesel Particle concentration in the air' )
+
+hist(data_cal$Pesticides, main='Histogram of state-level Pesticides concentration in the air' )
+
+hist(data_cal$Tox.Release, main='Histogram of state-level Toxin concentration in the air' )
+
+
+pairs(Asthma ~ Ozone + PM2.5 + DieselPM + Pesticides + Tox.Release , dat = data_cal)
+```
+
+# for other diseases
+
+```{r}
+#histograms for the air pollution factors
+hist(data_cal$Ozone, main='Histogram of state-level Ozone concentration in the air' )
+
+hist(data_cal$PM2.5, main='Histogram of state-level PM 2.5 concentration in the air' )
+
+hist(data_cal$DieselPM, main='Histogram of state-level Diesel Particle concentration in the air' )
+
+hist(data_cal$Pesticides, main='Histogram of state-level Pesticides concentration in the air' )
+
+hist(data_cal$Tox.Release, main='Histogram of state-level Toxin concentration in the air' )
+
+
+pairs(Asthma ~ Ozone + PM2.5 + DieselPM + Pesticides + Tox.Release , dat = data_cal)
+```
+
+
+
+```{r}
+#forward selection
+
+require(broom)
+data_cal1 <- na.omit(data_cal)
+#forward selection procedure using AIC values 
+lm1 <- lm(Asthma ~ 1, data=data_cal1)
+stepModel <- step(lm1, direction="forward",
+scope=(~ Ozone + PM2.5 + DieselPM+ DrinkingWater+Pesticides+Tox.Release+Traffic +CleanupSites + GroundwaterThreats+ Haz.Waste + Imp.WaterBodies + 
+SolidWaste + PollutionBurden + Education+LinguisticIsolation+Poverty+Unemployment+HousingBurden+Pop.Char.+LowBirthWeight+CardiovascularDisease), data=data_cal1)
+```
+The desired model: 
+Asthma ~ Pop.Char. + LinguisticIsolation + DrinkingWater + CardiovascularDisease + 
+    Ozone + Education + LowBirthWeight + HousingBurden + DieselPM + 
+    Unemployment + Traffic + CleanupSites + Tox.Release + Imp.WaterBodies + 
+    PollutionBurden + PM2.5 + GroundwaterThreats + Haz.Waste
