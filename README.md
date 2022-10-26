@@ -14,10 +14,12 @@ In forward selection model these NAs have to be removed
 
 (the AIC is pretty big thou)
 The desired model: 
-Asthma ~ Pop.Char. + LinguisticIsolation + DrinkingWater + CardiovascularDisease + 
-    Ozone + Education + LowBirthWeight + HousingBurden + DieselPM + 
-    Unemployment + Traffic + CleanupSites + Tox.Release + Imp.WaterBodies + 
-    PollutionBurden + PM2.5 + GroundwaterThreats + Haz.Waste
-    
+The desired model: 
+Asthma ~ CardiovascularDisease + Poverty + Ozone + LowBirthWeight + 
+    LinguisticIsolation + DieselPM + DrinkingWater + Unemployment + 
+    GroundwaterThreats + Tox.Release + PM2.5 + CleanupSites + 
+    PollutionBurden + Imp.WaterBodies + HousingBurden + Traffic + 
+    Pesticides + Haz.Waste
+   
     
     
