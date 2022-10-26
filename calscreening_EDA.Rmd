@@ -1,6 +1,6 @@
 ---
 title: "calscreening2018"
-author: "Group 21: Pluto Zhang, Linfeng Hu, Cynthia Ma"
+author: "Group 21; Group name: 21 and me; Members: Pluto Zhang, Linfeng Hu, Cynthia Ma"
 date: "2022-10-26"
 output: html_document
 ---
@@ -47,7 +47,7 @@ What about
 *****
 columns for diseases: Asthma LowBirthWeight CardiovascularDisease
 
-columns for socio economic elements:
+columns for socio-economic elements:
  Education LinguisticIsolation Poverty Unemployment HousingBurden Pop.Char.
 
 columns for air pollution elements: 
@@ -60,22 +60,17 @@ SolidWaste PollutionBurden
 air_pollutants_vec <- names(data_cal)[12:38]
 air_pollutants_vec
 
-
-
 disease_vec <- names(data_cal)[39:44]
 disease_vec
 
-soecon <- names(data_cal)[45:57]
-soecon
+soecon_vec <- names(data_cal)[45:57]
+soecon_vec
 ```
 
 # EDA
 
 ## EDA for Pollution factors
 ```{r}
-
-
-
 #histograms for the air pollution factors
 hist(data_cal$Ozone, main='Histogram of state-level Ozone concentration in the air' )
 
@@ -102,31 +97,65 @@ hist(data_cal$LowBirthWeight, main='Histogram of Low Birth Weight Prevalence' )
 hist(data_cal$CardiovascularDisease, main='Histogram of state-level Cardiovascular Diseases Prevalence' )
 
 
-
-
 pairs(Asthma ~ LowBirthWeight + CardiovascularDisease , dat = data_cal)
 ```
 
 
 #for socioeconomic factors
 ```{r}
-
+pairs(Asthma ~ Education + LinguisticIsolation + Poverty + Unemployment + HousingBurden, dat = data_cal)
+#pairs(Pop.Char.~ Education + LinguisticIsolation + Poverty + Unemployment + HousingBurden, dat = data_cal)
 ```
 
 
 ```{r}
 #forward selection
-
 require(broom)
 data_cal1 <- na.omit(data_cal)
 #forward selection procedure using AIC values 
 lm1 <- lm(Asthma ~ 1, data=data_cal1)
 stepModel <- step(lm1, direction="forward",
 scope=(~ Ozone + PM2.5 + DieselPM+ DrinkingWater+Pesticides+Tox.Release+Traffic +CleanupSites + GroundwaterThreats+ Haz.Waste + Imp.WaterBodies + 
-SolidWaste + PollutionBurden + Education+LinguisticIsolation+Poverty+Unemployment+HousingBurden+Pop.Char.+LowBirthWeight+CardiovascularDisease), data=data_cal1)
+SolidWaste + Education+LinguisticIsolation+Poverty+Unemployment+HousingBurden+ LowBirthWeight+CardiovascularDisease), data=data_cal1)
+
 ```
 The desired model: 
-Asthma ~ Pop.Char. + LinguisticIsolation + DrinkingWater + CardiovascularDisease + 
-    Ozone + Education + LowBirthWeight + HousingBurden + DieselPM + 
-    Unemployment + Traffic + CleanupSites + Tox.Release + Imp.WaterBodies + 
-    PollutionBurden + PM2.5 + GroundwaterThreats + Haz.Waste
+Asthma ~ CardiovascularDisease + Poverty + Ozone + LowBirthWeight + 
+    LinguisticIsolation + DieselPM + DrinkingWater + Unemployment + 
+    GroundwaterThreats + Tox.Release + PM2.5 + CleanupSites + 
+    PollutionBurden + Imp.WaterBodies + HousingBurden + Traffic + 
+    Pesticides + Haz.Waste
+    
+```{r}
+#stepwise selection
+lm_stepwise <- lm(Asthma ~ Ozone + PM2.5 + DieselPM+ DrinkingWater+Pesticides+Tox.Release+Traffic +CleanupSites + GroundwaterThreats+ Haz.Waste + Imp.WaterBodies + 
+SolidWaste + PollutionBurden + Education+LinguisticIsolation+Poverty+Unemployment+HousingBurden+LowBirthWeight+CardiovascularDisease, data=data_cal1)
+stepModel <- step(lm_stepwise, direction="both")
+```
+
+The stepwise model selection method and forward selection method outputs match each other. Combined with our subject matter knowledge, we will proceed with modeling using the following covariates: Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + 
+    Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
+    Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + 
+    Poverty + Unemployment + HousingBurden + LowBirthWeight + 
+    CardiovascularDisease
+
+#### Missing Data
+
+
+#### Modeling
+
+##### Linear, additive, or other models (LASSO, ridge)
+```{r}
+
+```
+
+##### Logistic, Multinomial, Ordinal Model
+```{r}
+
+```
+
+##### Poisson
+```{r}
+
+```
+
