@@ -1,6 +1,6 @@
 ---
 title: "data_exploration"
-author: "Group 21"
+author: "Group number: 21; Group name & members: 'Group 21' (Cynthia Ma, Pluto Zhang, Linfeng Hu)"
 date: "2022-10-07"
 output:
   word_document:
@@ -131,7 +131,33 @@ pairs(o3_mean ~ pm2.5_mean + so2_mean + co_mean + no2_mean, data = fulldat)
 pairs(Asthmap ~ total_homeless + SNAP + unemployment_rate + Total_poverty, dat = fulldat)
 
 ```
-from the paired scatterplot, the pervalence of Asthma is independent of the four main variables in the socioeconomic category. 
+
+From the paired scatterplot, the pervalence of Asthma is independent of the four main variables in the socioeconomic category. 
+
+
+#### General scatter plots
+```{r}
+par(mfrow = c(2,2))
+scatter.smooth(fulldat$TOB, fulldat$Asthmap) 
+scatter.smooth(fulldat$selfHlthDataValue, fulldat$Asthmap) 
+scatter.smooth(fulldat$HlthCareDataValue, fulldat$Asthmap) 
+scatter.smooth(fulldat$SNAP, fulldat$Asthmap) 
+par(mfrow = c(2,2))
+scatter.smooth(fulldat$individual_homeless, fulldat$Asthmap) 
+scatter.smooth(fulldat$fam_homeless, fulldat$Asthmap)
+scatter.smooth(fulldat$total_homeless, fulldat$Asthmap) 
+scatter.smooth(fulldat$unemployment_rate, fulldat$Asthmap) 
+par(mfrow = c(2,2))
+scatter.smooth(fulldat$Female_poverty, fulldat$Asthmap) 
+scatter.smooth(fulldat$Total_poverty, fulldat$Asthmap) 
+scatter.smooth(fulldat$o3_mean, fulldat$Asthmap) 
+scatter.smooth(fulldat$pm2.5_mean, fulldat$Asthmap) 
+par(mfrow = c(2,2))
+scatter.smooth(fulldat$so2_mean, fulldat$Asthmap) 
+scatter.smooth(fulldat$co_mean, fulldat$Asthmap) 
+scatter.smooth(fulldat$no2_mean, fulldat$Asthmap) 
+```
+We can see from the scatter plots that some crude values are heavily clustered (especially socioeconomic data). This coincides with our findings above in the socioeconomic section where the histograms are heavily skewed. We may consider to take log of these data in our further analyses.
 
 
 #### Forward Selection
