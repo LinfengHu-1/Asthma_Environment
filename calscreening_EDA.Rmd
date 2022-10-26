@@ -1,6 +1,6 @@
 ---
 title: "calscreening2018"
-author: "Pluto Zhang, Linfeng Hu, Cynthia Ma"
+author: "Group 21: Pluto Zhang, Linfeng Hu, Cynthia Ma"
 date: "2022-10-26"
 output: html_document
 ---
@@ -94,21 +94,24 @@ pairs(Asthma ~ Ozone + PM2.5 + DieselPM + Pesticides + Tox.Release , dat = data_
 # for other diseases
 
 ```{r}
-#histograms for the air pollution factors
-hist(data_cal$Ozone, main='Histogram of state-level Ozone concentration in the air' )
+#histograms for the other diseases factors
+hist(data_cal$Asthma, main='Histogram of state-level Asthma rate(age-adjusted)' )
 
-hist(data_cal$PM2.5, main='Histogram of state-level PM 2.5 concentration in the air' )
+hist(data_cal$LowBirthWeight, main='Histogram of Low Birth Weight Prevalence' )
 
-hist(data_cal$DieselPM, main='Histogram of state-level Diesel Particle concentration in the air' )
-
-hist(data_cal$Pesticides, main='Histogram of state-level Pesticides concentration in the air' )
-
-hist(data_cal$Tox.Release, main='Histogram of state-level Toxin concentration in the air' )
+hist(data_cal$CardiovascularDisease, main='Histogram of state-level Cardiovascular Diseases Prevalence' )
 
 
-pairs(Asthma ~ Ozone + PM2.5 + DieselPM + Pesticides + Tox.Release , dat = data_cal)
+
+
+pairs(Asthma ~ LowBirthWeight + CardiovascularDisease , dat = data_cal)
 ```
 
+
+#for socioeconomic factors
+```{r}
+
+```
 
 
 ```{r}
