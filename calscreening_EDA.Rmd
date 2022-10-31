@@ -143,11 +143,27 @@ The stepwise model selection method and forward selection method outputs match e
 
 
 #### Modeling
+```{r}
+#vector of covariates of interest
+vec_cov <- c("Ozone", "PM2.5", "DieselPM", "DrinkingWater", "Pesticides", "Tox.Release", "Traffic", "CleanupSites", "GroundwaterThreats", "Haz.Waste", "Imp.WaterBodies", "PollutionBurden", "LinguisticIsolation", "Poverty", "Unemployment", "HousingBurden", "LowBirthWeight", "CardiovascularDisease")
+```
+
 
 ##### Linear, additive, or other models (LASSO, ridge)
 ```{r}
-
+lm_pureLinear = lm(Asthma ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + Tox.Release + Traffic + CleanupSites + GroundwaterThreats + Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + Poverty + Unemployment + HousingBurden + LowBirthWeight + CardiovascularDisease, data=data_cal1)
+summary(lm_pureLinear)
+confint(lm_pureLinear)
+#Evaluation for this simple linear model
+plot(lm_pureLinear)
+plot(resid(lm_pureLinear) ~ fitted(lm_pureLinear)) # assesses linearity and equal variance
+abline(h=0, col="red") # adds the zero line for reference
+hist(lm_pureLinear$residuals)
 ```
+This simple linear model is unsatisfactory. We can see from the plot of Residuals vs. Fitted that there's fanning trend, no equal variance above and below the line. The QQ-plot also shows non-normality with clear deviation from the diagonal line on both ends of the fitted curve.
+
+
+
 
 ##### Logistic, Multinomial, Ordinal Model
 ```{r}
