@@ -156,20 +156,43 @@ summary(lm_pureLinear)
 confint(lm_pureLinear)
 #Evaluation for this simple linear model
 plot(lm_pureLinear)
-plot(resid(lm_pureLinear) ~ fitted(lm_pureLinear)) # assesses linearity and equal variance
-abline(h=0, col="red") # adds the zero line for reference
-hist(lm_pureLinear$residuals)
 ```
 This simple linear model is unsatisfactory. We can see from the plot of Residuals vs. Fitted that there's fanning trend, no equal variance above and below the line. The QQ-plot also shows non-normality with clear deviation from the diagonal line on both ends of the fitted curve.
 
+- pesticides, traffic, hazard waste are not statistically significant. We may consider removing these covariates.
+
+- Housing burden as a lower significance level (higher p-value) compared to other covariates may consider removing it from linear model as well.
+
+
 ```{r}
-model_spline=lm(Asthma~bSpline(Ozone,df=4)+ PM2.5 + DieselPM + DrinkingWater + Pesticides + Tox.Release + Traffic + CleanupSites + GroundwaterThreats + Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + Poverty + Unemployment + HousingBurden + LowBirthWeight + CardiovascularDisease,data=data_cal1)
+#remove coefficients with lower significance level, include only if coefficients are coded "***" significant
+lm_rmSig = lm(Asthma ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Tox.Release + CleanupSites + GroundwaterThreats + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + CardiovascularDisease, data=data_cal1)
+summary(lm_rmSig)
+confint(lm_rmSig)
+#Evaluation for this simple linear model
+plot(lm_rmSig)
+```
+```{r}
+#leave coefficients with significant level <2e-16
+lm_highSig = lm(Asthma ~ Ozone + PM2.5 + DieselPM + DrinkingWater + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + CardiovascularDisease, data=data_cal1)
+summary(lm_highSig)
+confint(lm_highSig)
+#Evaluation for this simple linear model
+plot(lm_highSig)
+```
+
+
+```{r}
+#add spline term to every term with significance level <2e-16 & PM2.5
+model_spline=lm(Asthma~bSpline(Ozone,df=4) + bSpline(PM2.5, df=4) + bSpline(DieselPM, df=4) + bSpline(DrinkingWater, df=4) + Tox.Release + CleanupSites + GroundwaterThreats + Imp.WaterBodies + PollutionBurden + bSpline(LinguisticIsolation, df=4) + bSpline(Poverty, df=4) + bSpline(Unemployment, df=4) + bSpline(LowBirthWeight, df=4) + bSpline(CardiovascularDisease, df=4), data=data_cal1)
 summary(model_spline)
-confint(model_spline)
 #model evaluation
 plot(model_spline)
 ```
 
+```{r}
+#LASSO
+```
 
 
 ##### Logistic, Multinomial, Ordinal Model
