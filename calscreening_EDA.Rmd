@@ -162,6 +162,13 @@ hist(lm_pureLinear$residuals)
 ```
 This simple linear model is unsatisfactory. We can see from the plot of Residuals vs. Fitted that there's fanning trend, no equal variance above and below the line. The QQ-plot also shows non-normality with clear deviation from the diagonal line on both ends of the fitted curve.
 
+```{r}
+model_spline=lm(Asthma~bSpline(Ozone,df=4)+ PM2.5 + DieselPM + DrinkingWater + Pesticides + Tox.Release + Traffic + CleanupSites + GroundwaterThreats + Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + Poverty + Unemployment + HousingBurden + LowBirthWeight + CardiovascularDisease,data=data_cal1)
+summary(model_spline)
+confint(model_spline)
+#model evaluation
+plot(model_spline)
+```
 
 
 
