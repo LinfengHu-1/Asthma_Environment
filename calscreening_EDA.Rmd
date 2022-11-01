@@ -173,5 +173,73 @@ This simple linear model is unsatisfactory. We can see from the plot of Residual
 ##### Poisson
 ```{r}
 
+library(dplyr)
+library(tidyverse)
+#round the Asthma rate to make sure that it's integers
+dataint <- data_cal1 |> mutate(Asthma = round(Asthma))
+mod.p_base <- glm(Asthma ~ PM2.5, data=dataint, family=poisson())
+summary(mod.p_base)
+exp(coef(mod.p_base)[2])
+
 ```
+From the summary statistics: we can see that with every 1 more unit increase in PM 2.5 concentration is estimated to be associated with, on average, 2% increase in the incidence rate of asthma among individuals that live in the counties with the current level of PM2.5 concentration.
+
+
+
+
+```{r}
+mod.p_ozone <- glm(Asthma ~ Ozone, data=dataint, family=poisson())
+summary(mod.p_ozone)
+exp(coef(mod.p_ozone)[2])
+mod.p_diesel <- glm(Asthma ~ DieselPM, data=dataint, family=poisson())
+summary(mod.p_diesel)
+exp(coef(mod.p_diesel)[2])
+```
+From the summary statistics: we can see that with every 1 more unit increase in ozone concentration is estimated to be associated with, on average, 4000% increase in the incidence rate of asthma among individuals that live in the counties with the current level of ozone concentration.
+
+From the summary statistics: we can see that with every 1 more unit increase in diesel particles is estimated to be associated with, on average, 0.5% increase in the incidence rate of asthma among individuals that live in the counties with the current level of concentration.
+
+As can see above, when modeled with Asthma rate alone, Ozone concentration has relatively high influence on asthma rates across the counties.
+
+```{r}
+
+```
+
+
+Now predict Asthma rate using the diseases:
+
+```{r}
+
+#coef(mod.p_ozone)
+mod.p_diseases <- glm(Asthma ~ LowBirthWeight+CardiovascularDisease, data=dataint, family=poisson())
+summary(mod.p_diseases)
+```
+
+
+
+```{r}
+mod.p_soecon <- glm(Asthma ~ PollutionBurden + LinguisticIsolation + 
+    Poverty + Unemployment + HousingBurden, data=dataint, family=poisson())
+summary(mod.p_soecon)
+```
+
+
+```{r}
+mod.poisson.full <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + 
+    Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
+    Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + 
+    Poverty + Unemployment + HousingBurden + LowBirthWeight + 
+    CardiovascularDisease, data=dataint, family=poisson())
+summary(mod.poisson.full)
+
+
+```
+
+```{r}
+sort(coef(mod.poisson.full) , decreasing = TRUE)
+```
+From the summary statistics of the full model, the Cardiovascular Disease, Low Birth Weight and PM 2.5 are the three major contributors to Asthma rate, using Poisson models. 
+
+
+Something to note: Ozone showed a very significant positive association with Asthma rate when modeled with Asthma rate alone, but showed negative association in the full model, which is open for later discussion and examinations. 
 
