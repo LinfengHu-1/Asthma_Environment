@@ -147,6 +147,11 @@ colnames(data_cal)[colSums(is.na(data_cal)) > 0]
 sum(is.na(data_cal$PM2.5))
 ```
 covariates with missing data: CES 3.0 Score, PM2.5, DrinkingWater, Traffic, LowBirthWeight, Education, LinguisticIsolation, Poverty, Unemployment, HousingBurden, Population characteristics.
+```{r}
+#look at rows with missing data
+dat_NA <- data_cal[!complete.cases(data_cal), ]
+rowSums(is.na(dat_NA))
+```
 
 
 #### Modeling
