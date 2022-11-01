@@ -140,6 +140,10 @@ The stepwise model selection method and forward selection method outputs match e
     CardiovascularDisease
 
 #### Missing Data
+```{r}
+#check for missing data
+colnames(data_cal1)[colSums(is.na(data_cal1)) > 0]
+```
 
 
 #### Modeling
@@ -191,7 +195,23 @@ plot(model_spline)
 ```
 
 ```{r}
-#LASSO
+#Ridge
+#define outcome variable
+y <- data_cal1$Asthma
+#define matrix of predictor variables
+x <- data.matrix(data_cal1[, c("Ozone","PM2.5")])
+library(glmnet)
+#fit ridge regression model
+lambda_grid <- .5 ^ (-20:20)
+mod_ridge <- glmnet(x, y,alpha=0.5,family="gaussian",lambda = lambda_grid)
+#view summary of model
+summary(mod_ridge)
+plot(mod_ridge)
+```
+
+
+```{r}
+#Elastic Net
 ```
 
 
