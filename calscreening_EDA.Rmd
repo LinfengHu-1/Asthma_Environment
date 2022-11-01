@@ -213,6 +213,14 @@ mod.p_pm_diesel <- glm(Asthma ~ PM2.5 + DieselPM, data=dataint, family=poisson()
 summary(mod.p_pm_diesel)
 #exp(coef(mod.p_diesel)[2])
 ```
+
+The percent change in PM 2.5 coefficient: (0.02 - 0.013)/0.013 > 10%
+Thus, DieselPM is likely a confounder of PM 2.5
+
+```{r}
+
+```
+
 ```{r}
 mod.p_pm_ozone <- glm(Asthma ~ PM2.5 + DieselPM+ Ozone, data=dataint, family=poisson())
 summary(mod.p_pm_ozone)
