@@ -142,9 +142,11 @@ The stepwise model selection method and forward selection method outputs match e
 #### Missing Data
 ```{r}
 #check for missing data
-colnames(data_cal1)[colSums(is.na(data_cal1)) > 0]
-anyNA(data_cal1)
+anyNA(data_cal)
+colnames(data_cal)[colSums(is.na(data_cal)) > 0]
+sum(is.na(data_cal$PM2.5))
 ```
+covariates with missing data: CES 3.0 Score, PM2.5, DrinkingWater, Traffic, LowBirthWeight, Education, LinguisticIsolation, Poverty, Unemployment, HousingBurden, Population characteristics.
 
 
 #### Modeling
