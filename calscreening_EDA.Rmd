@@ -159,7 +159,7 @@ plot_pattern(dat)
 ```{r}
 #Attempt Multivariate Imputation
 library(mice)
-invisible(tempData = mice(dat, m = 5, maxit = 25, seed = 210))
+tempData = mice(dat, m = 5, maxit = 25, seed = 210)
 summary(tempData)
 complete(tempData,action=1)
 ```
