@@ -153,12 +153,15 @@ dat_NA <- data_cal[!complete.cases(data_cal), ]
 rowSums(is.na(dat_NA))
 #look at missing pattern
 library(ggmice)
-dat <- data_cal |> select(Ozone, PM2.5, DieselPM, DrinkingWater, Poverty, Unemployment, LowBirthWeight, CardiovascularDisease)
+dat <- data_cal |> select(Asthma, Ozone, PM2.5, DieselPM, DrinkingWater, Poverty, Unemployment, LowBirthWeight, CardiovascularDisease)
 plot_pattern(dat)
 ```
 ```{r}
 #Attempt Multivariate Imputation
-
+library(mice)
+invisible(tempData = mice(dat, m = 5, maxit = 25, seed = 210))
+summary(tempData)
+complete(tempData,action=1)
 ```
 
 
