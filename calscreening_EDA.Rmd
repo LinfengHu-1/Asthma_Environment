@@ -143,6 +143,7 @@ The stepwise model selection method and forward selection method outputs match e
 ```{r}
 #check for missing data
 colnames(data_cal1)[colSums(is.na(data_cal1)) > 0]
+anyNA(data_cal1)
 ```
 
 
