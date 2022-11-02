@@ -325,7 +325,7 @@ summary(mod.p_ozone)
 exp(coef(mod.p_ozone)[2])
 exp(coef(mod.p_ozone)[3])
 ```
-From the summary statistics: we can see that with every 1 more unit increase in ozone concentration is estimated to be associated with, on average, 600% increase in the incidence rate of asthma among individuals that live in the counties with the current level of ozone concentration, holding Pm 2.5 constant
+From the summary statistics: we can see that with every 1 more unit increase in ozone concentration is estimated to be associated with, on average, 600% increase in the incidence rate of asthma among individuals that live in the counties with the current level of ozone concentration, holding PM 2.5 constant
 
 Something to note: Ozone showed a very significant positive association with Asthma rate when modeled with Asthma rate alone, but showed negative association in the full model, which is open for later discussion and examinations. 
 
@@ -356,6 +356,19 @@ summary(mod.p_soecon)
 ```
 poverty and unemployment both demonstrated positive relationship with Asthma, while linguistic isolation demonstrated negative relationship with Asthma. 
 
+```{r}
+mod.poisson.sim <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment+ LowBirthWeight +
+    CardiovascularDisease , data=dataint, family=quasipoisson)
+summary(mod.poisson.sim)
+
+```
+
+
+```{r}
+anova(mod.poisson.full,mod.poisson.sim, test ='Chisq')
+```
+
 
 Next, incoporating the quadratic terms of PM2.5, Diesel PM, Ozone into the model:
 
@@ -365,10 +378,6 @@ Hypothesis H0: this new model is better in terms of predicting the Asthma compar
 
 
 ```{r}
-mod.poisson.sim <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
-    Poverty + Unemployment+ LowBirthWeight +
-    CardiovascularDisease , data=dataint, family=quasipoisson)
-summary(mod.poisson.sim)
 
 mod.poisson.qua <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
     Poverty + Unemployment+ LowBirthWeight + 
