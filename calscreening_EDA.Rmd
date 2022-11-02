@@ -350,7 +350,11 @@ summary(mod.p_pmdinter)
 exp(coef(mod.p_pmdinter)[2])
 exp(coef(mod.p_pmdinter)[3])
 ```
+
+
 Checking for Pm 2.5 + Ozone as the predictor
+
+
 ```{r}
 mod.p_ozone <- glm(Asthma ~ PM2.5 + Ozone, data=dataint, family=poisson())
 summary(mod.p_ozone)
@@ -366,20 +370,19 @@ Something to note: Ozone showed a very significant positive association with Ast
 ```
 
 <<<<<<< HEAD
-Testing whether we can use the other two diseases as predictors for Asthma rate:
+Testing whether we can use low birth weight as predictors for Asthma rate:
 ```{r}
 
 #coef(mod.p_ozone)
-mod.p_diseases <- glm(Asthma ~ LowBirthWeight+CardiovascularDisease, data=dataint, family=quasipoisson)
+mod.p_diseases <- glm(Asthma ~ LowBirthWeight, data=dataint, family=quasipoisson)
 summary(mod.p_diseases)
 exp(coef(mod.p_diseases)[2])
-exp(coef(mod.p_diseases)[3])
+#exp(coef(mod.p_diseases)[3])
 
 summary(mod.p_diseases)$dispersion
 ```
-we can see that every 1 unit increase in percent of population with cardiovascular disease is estimated to be associated with, on average, 11% increase in the incidence rate of asthma among individuals that live in the counties with the current level of PM2.5 concentration, holding other variables constant.
 
-With every 1 unit increase in percent of population with Low Birth Weight, is estimated to be associated with, on average, 8% increase in the incidence rate of asthma among individuals that live in the counties with the current level of PM2.5 concentration, holding other variables constant.
+With every 1 unit increase in percent of population with Low Birth Weight, is estimated to be associated with, on average,13% increase in the incidence rate of asthma among individuals that live in the counties with the current level of PM2.5 concentration, holding other variables constant.
 
 Testing whether socioeconomic factors can be prediction factors for Asthma. 
 ```{r}
@@ -390,14 +393,15 @@ poverty and unemployment both demonstrated positive relationship with Asthma, wh
 
 ```{r}
 mod.poisson.sim <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
-    Poverty + Unemployment+ LowBirthWeight +
-    CardiovascularDisease , data=dataint, family=quasipoisson)
+    Poverty + Unemployment+ LowBirthWeight, data=dataint, family=quasipoisson)
 summary(mod.poisson.sim)
 
 ```
 
 
 ```{r}
+summary(mod.poisson.sim)$dispersion
+summary(mod.poisson.full)$dispersion
 anova(mod.poisson.full,mod.poisson.sim, test ='Chisq')
 ```
 
@@ -412,8 +416,7 @@ Hypothesis H0: this new model is better in terms of predicting the Asthma compar
 ```{r}
 
 mod.poisson.qua <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
-    Poverty + Unemployment+ LowBirthWeight + 
-    CardiovascularDisease + I(Ozone^2) + I(PM2.5^2) + I(DieselPM ^2), data=dataint, family=quasipoisson)
+    Poverty + Unemployment+ LowBirthWeight  + I(Ozone^2) + I(PM2.5^2) + I(DieselPM ^2), data=dataint, family=quasipoisson)
 summary(mod.poisson.qua)
 
 anova(mod.poisson.sim,mod.poisson.qua, test ='Chisq')
@@ -435,8 +438,7 @@ Next: to remedy for the overdispersion effects, we consider incorporating the ne
 
 ```{r}
 nbin1 <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
-    Poverty + Unemployment+ LowBirthWeight + 
-    CardiovascularDisease + I(Ozone^2) + I(PM2.5^2) + I(DieselPM ^2), data = dataint)
+    Poverty + Unemployment+ LowBirthWeight +  I(Ozone^2) + I(PM2.5^2) + I(DieselPM ^2), data = dataint)
 summary(nbin1)
 ```
 ```{r}
