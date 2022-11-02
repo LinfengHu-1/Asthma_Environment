@@ -39,18 +39,11 @@ colnames(data_cal) <- gsub(" ", "", colnames(data_cal))
 colnames(data_cal) <- gsub("\n", "", colnames(data_cal))
 names(data_cal)
 ```
-
-from the summary we can see there are at most 242 NAs 
-
-
-Question: how do we remove NAs? do we need to keep NAs? 
-What about 
-
-*****
+***
 columns for diseases: Asthma LowBirthWeight CardiovascularDisease
 
 columns for socio-economic elements:
- Education LinguisticIsolation Poverty Unemployment HousingBurden Pop.Char.
+ducation LinguisticIsolation Poverty Unemployment HousingBurden Pop.Char.
 
 columns for air pollution elements: 
 Ozone PM2.5 DieselPM DrinkingWater Pesticides Tox.Release
@@ -170,7 +163,7 @@ complete(tempData,action=1)
 #### Modeling
 ```{r}
 #vector of covariates of interest
-vec_cov <- c("Ozone", "PM2.5", "DieselPM", "DrinkingWater", "Pesticides", "Tox.Release", "Traffic", "CleanupSites", "GroundwaterThreats", "Haz.Waste", "Imp.WaterBodies", "PollutionBurden", "LinguisticIsolation", "Poverty", "Unemployment", "HousingBurden", "LowBirthWeight", "CardiovascularDisease")
+vec_cov <- c("Ozone", "PM2.5", "DieselPM", "LinguisticIsolation", "Poverty", "Unemployment", "LowBirthWeight")
 ```
 
 
@@ -266,9 +259,6 @@ vip(elasticnet.mod, num_features=10, geom = "point")
 x_noOzone <- data_cal1[, c("PM2.5", "DieselPM", "DrinkingWater", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight", "CardiovascularDisease")] |> as.matrix()
 elasticnet.mod.noOzone = glmnet(x_noOzone,y,alpha=0.5,family="gaussian",lambda = lambda_grid)
 vip(elasticnet.mod.noOzone, num_features=10, geom = "point")
-# par(mfrow=c(1,2))
-# plot(elasticnet.mod)
-# cv.out <- cv.glmnet(x,y, type.measure="mse",alpha=1) plot(cv.out)
 ```
 
 
