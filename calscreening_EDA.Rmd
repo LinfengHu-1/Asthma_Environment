@@ -164,6 +164,9 @@ complete(tempData,action=1)
 ```{r}
 #vector of covariates of interest
 vec_cov <- c("Ozone", "PM2.5", "DieselPM", "LinguisticIsolation", "Poverty", "Unemployment", "LowBirthWeight")
+
+#model with only covariates of interest
+data_cal <- data_cal[,c("CensusTract", "TotalPopulation", "CaliforniaCounty", "ZIP", "NearbyCity(tohelpapproximatelocationonly)", "Longitude", "Latitude", "Ozone", "PM2.5", "DieselPM", "Asthma", "LowBirthWeight","LinguisticIsolation", "Poverty", "Unemployment" )]
 ```
 
 
