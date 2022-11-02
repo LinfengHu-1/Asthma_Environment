@@ -19,6 +19,8 @@ library(ggplot2)
 library(ggthemes)
 library(ggrepel)
 library(data.table)
+library(nnet)
+library(VGAM)
 ```
 
 ```{r}
@@ -329,6 +331,64 @@ Something to note: Ozone showed a very significant positive association with Ast
 
 
 ```{r}
+
+```
+
+
+```{r}
+#multinomial regression
+data_cal <- data_cal %>% mutate(asthma_cat = case_when(
+  AsthmaPctl <=25 ~ 1,
+  AsthmaPctl <=50 ~ 2,
+  AsthmaPctl <=75 ~ 3,
+  AsthmaPctl <=100 ~ 4
+))
+
+summ.MNfit <- function(fit, digits=3){
+  s <- summary(fit)
+  for(i in 2:length(fit$lev)) {
+##
+cat("\nLevel", fit$lev[i], "vs. Level", fit$lev[1], "\n")
+##
+betaHat <- s$coefficients[(i-1),]
+se <- s$standard.errors[(i-1),]
+zStat <- betaHat / se
+pval <- 2 * pnorm(abs(zStat), lower.tail=FALSE)
+##
+RRR <- exp(betaHat)
+RRR.lower <- exp(betaHat - qnorm(0.975)*se)
+RRR.upper <- exp(betaHat + qnorm(0.975)*se)
+##
+results <- cbind(betaHat, se, pval, RRR, RRR.lower, RRR.upper)
+print(round(results, digits=digits))
+}
+}
+
+mod.multi <- multinom(asthma_cat ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + 
+    Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
+    Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + 
+    Poverty + Unemployment + HousingBurden + LowBirthWeight + 
+    CardiovascularDisease, data=data_cal)
+
+summ.MNfit(mod.multi)
+
+mod.ord <- vglm(asthma_cat ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + 
+    Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
+    Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + 
+    Poverty + Unemployment + HousingBurden + LowBirthWeight + 
+    CardiovascularDisease, cumulative(parallel=TRUE, reverse=TRUE),data=data_cal)
+
+summary(mod.ord)
+
+mod.ord.npo <- vglm(asthma_cat ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + 
+    Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
+    Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + 
+    Poverty + Unemployment + HousingBurden + LowBirthWeight + 
+    CardiovascularDisease, cumulative(parallel=FALSE, reverse=TRUE),data=data_cal)
+
+pchisq(deviance(mod.ord)-deviance(mod.ord.npo), df=df.residual(mod.ord)-df.residual(mod.ord.npo),lower.tail=F)
+#proportional odds does not hold --> use multinomial
+
 
 ```
 
