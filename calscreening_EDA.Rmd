@@ -246,89 +246,156 @@ library(dplyr)
 library(tidyverse)
 #round the Asthma rate to make sure that it's integers
 dataint <- data_cal1 |> mutate(Asthma = round(Asthma))
-mod.p_base <- glm(Asthma ~ PM2.5, data=dataint, family=poisson())
-summary(mod.p_base)
-exp(coef(mod.p_base)[2])
 
-```
-From the summary statistics: we can see that with every 1 more unit increase in PM 2.5 concentration is estimated to be associated with, on average, 2% increase in the incidence rate of asthma among individuals that live in the counties with the current level of PM2.5 concentration.
-
-
-
-
-```{r}
-mod.p_ozone <- glm(Asthma ~ Ozone, data=dataint, family=poisson())
-summary(mod.p_ozone)
-exp(coef(mod.p_ozone)[2])
-mod.p_diesel <- glm(Asthma ~ DieselPM, data=dataint, family=poisson())
-summary(mod.p_diesel)
-exp(coef(mod.p_diesel)[2])
-```
-From the summary statistics: we can see that with every 1 more unit increase in ozone concentration is estimated to be associated with, on average, 4000% increase in the incidence rate of asthma among individuals that live in the counties with the current level of ozone concentration.
-
-From the summary statistics: we can see that with every 1 more unit increase in diesel particles is estimated to be associated with, on average, 0.5% increase in the incidence rate of asthma among individuals that live in the counties with the current level of concentration.
-
-
-
-```{r}
-mod.p_pm_diesel <- glm(Asthma ~ PM2.5 + DieselPM, data=dataint, family=poisson())
-summary(mod.p_pm_diesel)
-#exp(coef(mod.p_diesel)[2])
-```
-
-The percent change in PM 2.5 coefficient: (0.02 - 0.013)/0.013 > 10%
-Thus, DieselPM is likely a confounder of PM 2.5
-
-```{r}
-
-```
-
-```{r}
-mod.p_pm_ozone <- glm(Asthma ~ PM2.5 + DieselPM+ Ozone, data=dataint, family=poisson())
-summary(mod.p_pm_ozone)
-```
-As can see above, when modeled with Asthma rate alone, Ozone concentration has relatively high influence on asthma rates across the counties.
-
-Now predict Asthma rate using the diseases:
-
-```{r}
-
-#coef(mod.p_ozone)
-mod.p_diseases <- glm(Asthma ~ LowBirthWeight+CardiovascularDisease, data=dataint, family=poisson())
-summary(mod.p_diseases)
-```
-
-
-
-```{r}
-mod.p_soecon <- glm(Asthma ~ PollutionBurden + LinguisticIsolation + 
-    Poverty + Unemployment + HousingBurden, data=dataint, family=poisson())
-summary(mod.p_soecon)
-```
-
-
-```{r}
 mod.poisson.full <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + 
     Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
     Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + 
     Poverty + Unemployment + HousingBurden + LowBirthWeight + 
-    CardiovascularDisease, data=dataint, family=poisson())
+    CardiovascularDisease, data=dataint, family=quasipoisson)
 summary(mod.poisson.full)
 
 
+sort(coef(mod.poisson.full) , decreasing = TRUE)
+
+
 ```
+
+
+
+From the summary statistics of the full model, the Cardiovascular Disease, Low Birth Weight and PM 2.5 are the three major contributors to Asthma rate, using Poisson models. 
+While Ozone is the factor that is negatively correlated with Asthma rate, as is shown in the linear model. 
+
+Since pesticides, traffic, Haz.waste, Imp.WaterBodies, PollutionBurden and Housing burden variables have both relatively lower p-values and small 
+Since drinking water, cleanup sites and Ground Water threats have relatively very low coefficients, we exclude their effects for the next round of analysis.  
+
+Thus, what we keep for the next round of analysis are 8 variables: PM2.5, Ozone, DieselPM, Unemployment, Poverty, Linguistic Isolation, Low Birth Weight and Cardiovascular Diseases.
+
+
+
+checking for dispersion:
 
 ```{r}
-sort(coef(mod.poisson.full) , decreasing = TRUE)
+deviance(mod.poisson.full)/mod.poisson.full$df.residual
 ```
-From the summary statistics of the full model, the Cardiovascular Disease, Low Birth Weight and PM 2.5 are the three major contributors to Asthma rate, using Poisson models. 
+Since the quotient is greater than 1, 
+There exists some form of overdispersion in the data.
 
+First, we look at the model with the air pollution factors:
+We want to approximate the effects of Pmm 2.5 and Asthma
+```{r}
+mod.p_base <- glm(Asthma ~ PM2.5, data=dataint, family=quasipoisson)
+summary(mod.p_base)
+exp(coef(mod.p_base)[2])
+
+deviance(mod.p_base)/mod.p_base$df.residual
+```
+
+The model with Pm 2.5 alone has very great overdispersion. 
+
+From the summary statistics: we can see that with every 1 more unit increase in PM 2.5 concentration is estimated to be associated with, on average, 2% increase in the incidence rate of asthma among individuals that live in the counties with the current level of PM2.5 concentration.
+
+
+```{r}
+mod.p_pmd <- glm(Asthma ~ PM2.5 + DieselPM, data=dataint, family=poisson())
+summary(mod.p_pmd)
+exp(coef(mod.p_pmd)[2])
+exp(coef(mod.p_pmd)[3])
+```
+From the summary statistics: we can see that with every 1 more unit increase in PM 2.5 concentration is estimated to be associated with, on average, 1.3% increase in the incidence rate of asthma among individuals that live in the counties with the current level of PM2.5 concentration.
+
+Diesel is likely a confonder for the effects of PM 2.5, because dieselPM contributes to a portion of PM 2.5, while the total PM2.5 amount doesn't directly lead to DieselPM. 
+The changes in coefficient of PM 2.5:
+(0.02-0.013)/0.013 = 53.8% > 10%
+Thus, diesel PM satisfies the confounding effect. 
+
+Then we test the effect modifying of DieselPM:
+The interaction terms has a p-value below the significant threshold. SO we can conclude that it is an effect modifier of PM 2.5. 
+```{r}
+mod.p_pmdinter <- glm(Asthma ~ PM2.5 * DieselPM, data=dataint, family=poisson())
+summary(mod.p_pmdinter)
+exp(coef(mod.p_pmdinter)[2])
+exp(coef(mod.p_pmdinter)[3])
+```
+Checking for Pm 2.5 + Ozone as the predictor
+```{r}
+mod.p_ozone <- glm(Asthma ~ PM2.5 + Ozone, data=dataint, family=poisson())
+summary(mod.p_ozone)
+exp(coef(mod.p_ozone)[2])
+exp(coef(mod.p_ozone)[3])
+```
+From the summary statistics: we can see that with every 1 more unit increase in ozone concentration is estimated to be associated with, on average, 600% increase in the incidence rate of asthma among individuals that live in the counties with the current level of ozone concentration, holding Pm 2.5 constant
 
 Something to note: Ozone showed a very significant positive association with Asthma rate when modeled with Asthma rate alone, but showed negative association in the full model, which is open for later discussion and examinations. 
 
-
-
 ```{r}
 
 ```
 
+Testing whether we can use the other two diseases as predictors for Asthma rate:
+```{r}
+
+#coef(mod.p_ozone)
+mod.p_diseases <- glm(Asthma ~ LowBirthWeight+CardiovascularDisease, data=dataint, family=quasipoisson)
+summary(mod.p_diseases)
+exp(coef(mod.p_diseases)[2])
+exp(coef(mod.p_diseases)[3])
+
+summary(mod.p_diseases)$dispersion
+```
+we can see that every 1 unit increase in percent of population with cardiovascular disease is estimated to be associated with, on average, 11% increase in the incidence rate of asthma among individuals that live in the counties with the current level of PM2.5 concentration, holding other variables constant.
+
+With every 1 unit increase in percent of population with Low Birth Weight, is estimated to be associated with, on average, 8% increase in the incidence rate of asthma among individuals that live in the counties with the current level of PM2.5 concentration, holding other variables constant.
+
+Testing whether socioeconomic factors can be prediction factors for Asthma. 
+```{r}
+mod.p_soecon <- glm(Asthma ~ Poverty + Unemployment + LinguisticIsolation, data=dataint, family=poisson())
+summary(mod.p_soecon)
+```
+poverty and unemployment both demonstrated positive relationship with Asthma, while linguistic isolation demonstrated negative relationship with Asthma. 
+
+
+Next, incoporating the quadratic terms of PM2.5, Diesel PM, Ozone into the model:
+
+Hypothesis testing: comparing the linear simple model with the 8 variables, to the model that has the quadratic terms of the three environmental factors PM 2.5, Ozone and DieselPM.
+
+Hypothesis H0: this new model is better in terms of predicting the Asthma compared to the simple model
+
+
+```{r}
+mod.poisson.sim <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment+ LowBirthWeight +
+    CardiovascularDisease , data=dataint, family=quasipoisson)
+summary(mod.poisson.sim)
+
+mod.poisson.qua <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment+ LowBirthWeight + 
+    CardiovascularDisease + I(Ozone^2) + I(PM2.5^2) + I(DieselPM ^2), data=dataint, family=quasipoisson)
+summary(mod.poisson.qua)
+
+anova(mod.poisson.sim,mod.poisson.qua, test ='Chisq')
+```
+
+
+Since the p-value is lower than zero, it's sufficient for us to reject the null hypothesis. Thus, the model with quadratic terms is better in predicting Asthma rate, as compared to the simple model. 
+
+
+
+Check for overdispersion:
+```{r}
+summary(mod.poisson.qua)$dispersion
+summary(mod.poisson.sim)$dispersion
+```
+The quadratic model has smaller overdispersion quotient than the linear model, which indicates that it has better goodness of fit. 
+
+Next: to remedy for the overdispersion effects, we consider incorporating the negative binomial model: 
+
+```{r}
+nbin1 <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment+ LowBirthWeight + 
+    CardiovascularDisease + I(Ozone^2) + I(PM2.5^2) + I(DieselPM ^2), data = dataint)
+summary(nbin1)
+```
+```{r}
+summary(nbin1)$dispersion
+```
+The negative binomial model has dispersion quotient of 1, and all the terms are statistically significant with p-values much smaller than the 0.05 threshold. Thus, it's a desirable model at this step. 
