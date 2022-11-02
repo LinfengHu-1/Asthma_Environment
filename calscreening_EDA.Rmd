@@ -39,18 +39,11 @@ colnames(data_cal) <- gsub(" ", "", colnames(data_cal))
 colnames(data_cal) <- gsub("\n", "", colnames(data_cal))
 names(data_cal)
 ```
-
-from the summary we can see there are at most 242 NAs 
-
-
-Question: how do we remove NAs? do we need to keep NAs? 
-What about 
-
-*****
+***
 columns for diseases: Asthma LowBirthWeight CardiovascularDisease
 
 columns for socio-economic elements:
- Education LinguisticIsolation Poverty Unemployment HousingBurden Pop.Char.
+ducation LinguisticIsolation Poverty Unemployment HousingBurden Pop.Char.
 
 columns for air pollution elements: 
 Ozone PM2.5 DieselPM DrinkingWater Pesticides Tox.Release
@@ -170,7 +163,13 @@ complete(tempData,action=1)
 #### Modeling
 ```{r}
 #vector of covariates of interest
-vec_cov <- c("Ozone", "PM2.5", "DieselPM", "DrinkingWater", "Pesticides", "Tox.Release", "Traffic", "CleanupSites", "GroundwaterThreats", "Haz.Waste", "Imp.WaterBodies", "PollutionBurden", "LinguisticIsolation", "Poverty", "Unemployment", "HousingBurden", "LowBirthWeight", "CardiovascularDisease")
+vec_cov <- c("Ozone", "PM2.5", "DieselPM", "LinguisticIsolation", "Poverty", "Unemployment", "LowBirthWeight")
+
+#model with only covariates of interest
+data_cal <- data_cal[,c("CensusTract", "TotalPopulation", "CaliforniaCounty", "ZIP", "NearbyCity(tohelpapproximatelocationonly)", "Longitude", "Latitude", "Ozone", "PM2.5", "DieselPM", "Asthma", "LowBirthWeight","LinguisticIsolation", "Poverty", "Unemployment" )]
+
+#check proportion of missing values
+sum(!complete.cases(data_cal))/nrow(data_cal)
 ```
 
 
@@ -217,22 +216,55 @@ plot(model_spline)
 
 ```{r}
 #Ridge
+library(dplyr)
 #define outcome variable
-y <- data_cal1$Asthma
+y <- data_cal1 |> select(Asthma) |> scale(center = TRUE, scale = FALSE) |> as.matrix()
 #define matrix of predictor variables
-x <- data.matrix(data_cal1[, c("Ozone","PM2.5")])
+x <- data_cal1[, c("Ozone", "PM2.5", "DieselPM", "DrinkingWater", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight", "CardiovascularDisease")] |> as.matrix()
 library(glmnet)
 #fit ridge regression model
-lambda_grid <- .5 ^ (-20:20)
-mod_ridge <- glmnet(x, y,alpha=0.5,family="gaussian",lambda = lambda_grid)
+lambda_seq <- 10^seq(2, -2, by = -.1)
+mod_ridge <- glmnet(x, y,alpha=0.5,family="gaussian",lambda = lambda_seq)
+best_lambda <- mod_ridge$lambda.min
+best_lambda
+
+
+# library(MASS)
+# fit = lm.ridge(Asthma ~ Ozone + PM2.5 + DieselPM + DrinkingWater + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + CardiovascularDisease, data_cal1, lambda = seq(0, .4, 1e-3))
+# par(mar = c(4, 4, 0, 0), cex = 0.7, las = 1)
+# matplot(fit$lambda, coef(fit), type = "l", ylim = c(-1, 3),
+#         xlab = expression(lambda), ylab = expression(hat(beta)))
+
+
 #view summary of model
-summary(mod_ridge)
-plot(mod_ridge)
+summary(fit)
+plot(fit)
 ```
 
 
 ```{r}
 #Elastic Net
+# library(caret)
+# # Model Building : Elastic Net Regression
+# control <- trainControl(method = "repeatedcv", number = 5, repeats = 5, search = "random", verboseIter = TRUE)
+# # Training elastic Net Regression model
+# elastic_model <- train(Asthma ~ ., data = cbind(x, y), method = "glmnet", preProcess = c("center", "scale"), tuneLength = 25,trControl = control)
+# #elastic_model
+# # Model Prediction
+# x_hat_pre <- predict(elastic_model, y)
+# x_hat_pre
+# # Multiple R-squared
+# rsq <- cor(x, x_hat_pre)^2
+# rsq
+# # Plot
+# plot(elastic_model, main = "Elastic Net Regression")
+library(vip)
+elasticnet.mod = glmnet(x,y,alpha=0.5,family="gaussian",lambda = lambda_grid)
+vip(elasticnet.mod, num_features=10, geom = "point")
+#now we look at the Variable importance (vip) for factors excluding Ozone
+x_noOzone <- data_cal1[, c("PM2.5", "DieselPM", "DrinkingWater", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight", "CardiovascularDisease")] |> as.matrix()
+elasticnet.mod.noOzone = glmnet(x_noOzone,y,alpha=0.5,family="gaussian",lambda = lambda_grid)
+vip(elasticnet.mod.noOzone, num_features=10, geom = "point")
 ```
 
 
