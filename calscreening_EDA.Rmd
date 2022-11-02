@@ -382,7 +382,7 @@ exp(coef(mod.p_diseases)[2])
 summary(mod.p_diseases)$dispersion
 ```
 
-With every 1 unit increase in percent of population with Low Birth Weight, is estimated to be associated with, on average,13% increase in the incidence rate of asthma among individuals that live in the counties with the current level of PM2.5 concentration, holding other variables constant.
+With every 1 unit increase in percent of population with Low Birth Weight, is estimated to be associated with, on average,13% increase in the incidence rate of asthma among individuals.
 
 Testing whether socioeconomic factors can be prediction factors for Asthma. 
 ```{r}
