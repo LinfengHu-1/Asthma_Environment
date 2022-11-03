@@ -107,6 +107,7 @@ pairs(Asthma ~ Education + LinguisticIsolation + Poverty + Unemployment + Housin
 #forward selection
 require(broom)
 data_cal1 <- na.omit(data_cal)
+data_cal_old <- data_cal1
 #forward selection procedure using AIC values 
 lm1 <- lm(Asthma ~ 1, data=data_cal1)
 stepModel <- step(lm1, direction="forward",
@@ -196,7 +197,7 @@ plot(lm_highSig)
 vec_cov <- c("Ozone", "PM2.5", "DieselPM", "LinguisticIsolation", "Poverty", "Unemployment", "LowBirthWeight")
 
 #model with only covariates of interest
-data_cal <- data_cal[,c("CensusTract", "TotalPopulation", "CaliforniaCounty", "ZIP", "NearbyCity(tohelpapproximatelocationonly)", "Longitude", "Latitude", "Ozone", "PM2.5", "DieselPM", "Asthma", "LowBirthWeight","LinguisticIsolation", "Poverty", "Unemployment" )]
+data_cal <- data_cal[,c("CensusTract", "TotalPopulation", "CaliforniaCounty", "ZIP", "NearbyCity(tohelpapproximatelocationonly)", "Longitude", "Latitude", "Ozone", "PM2.5", "DieselPM", "Asthma","AsthmaPctl", "LowBirthWeight","LinguisticIsolation", "Poverty", "Unemployment" )]
 data_cal1 <- na.omit(data_cal)
 
 #check proportion of missing values
@@ -279,7 +280,7 @@ vip(elasticnet.mod.noOzone, num_features=10, geom = "point")
 library(dplyr)
 library(tidyverse)
 #round the Asthma rate to make sure that it's integers
-dataint <- data_cal1 |> mutate(Asthma = round(Asthma))
+dataint <- data_cal_old |> mutate(Asthma = round(Asthma))
 
 mod.poisson.full <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + 
     Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
@@ -476,27 +477,17 @@ print(round(results, digits=digits))
 }
 }
 
-mod.multi <- multinom(asthma_cat ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + 
-    Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
-    Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + 
-    Poverty + Unemployment + HousingBurden + LowBirthWeight + 
-    CardiovascularDisease, data=data_cal)
+mod.multi <- multinom(asthma_cat ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment + LowBirthWeight, data=data_cal)
 
 summ.MNfit(mod.multi)
 
-mod.ord <- vglm(asthma_cat ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + 
-    Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
-    Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + 
-    Poverty + Unemployment + HousingBurden + LowBirthWeight + 
-    CardiovascularDisease, cumulative(parallel=TRUE, reverse=TRUE),data=data_cal)
+mod.ord <- vglm(asthma_cat ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment + LowBirthWeight, cumulative(parallel=TRUE, reverse=TRUE),data=data_cal)
 
 summary(mod.ord)
 
-mod.ord.npo <- vglm(asthma_cat ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + 
-    Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
-    Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + 
-    Poverty + Unemployment + HousingBurden + LowBirthWeight + 
-    CardiovascularDisease, cumulative(parallel=FALSE, reverse=TRUE),data=data_cal)
+mod.ord.npo <- vglm(asthma_cat ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight, cumulative(parallel=FALSE, reverse=TRUE),data=data_cal)
 
 pchisq(deviance(mod.ord)-deviance(mod.ord.npo), df=df.residual(mod.ord)-df.residual(mod.ord.npo),lower.tail=F)
 #proportional odds does not hold --> use multinomial
