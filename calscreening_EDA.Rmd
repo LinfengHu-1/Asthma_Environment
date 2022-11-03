@@ -158,22 +158,6 @@ tempData = mice(dat, m = 5, maxit = 25, seed = 210)
 summary(tempData)
 complete(tempData,action=1)
 ```
-
-
-#### Modeling
-```{r}
-#vector of covariates of interest
-vec_cov <- c("Ozone", "PM2.5", "DieselPM", "LinguisticIsolation", "Poverty", "Unemployment", "LowBirthWeight")
-
-#model with only covariates of interest
-data_cal <- data_cal[,c("CensusTract", "TotalPopulation", "CaliforniaCounty", "ZIP", "NearbyCity(tohelpapproximatelocationonly)", "Longitude", "Latitude", "Ozone", "PM2.5", "DieselPM", "Asthma", "LowBirthWeight","LinguisticIsolation", "Poverty", "Unemployment" )]
-
-#check proportion of missing values
-sum(!complete.cases(data_cal))/nrow(data_cal)
-```
-
-
-##### Linear, additive, or other models (LASSO, ridge)
 ```{r}
 lm_pureLinear = lm(Asthma ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + Tox.Release + Traffic + CleanupSites + GroundwaterThreats + Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + Poverty + Unemployment + HousingBurden + LowBirthWeight + CardiovascularDisease, data=data_cal1)
 summary(lm_pureLinear)
@@ -196,6 +180,7 @@ confint(lm_rmSig)
 #Evaluation for this simple linear model
 plot(lm_rmSig)
 ```
+
 ```{r}
 #leave coefficients with significant level <2e-16
 lm_highSig = lm(Asthma ~ Ozone + PM2.5 + DieselPM + DrinkingWater + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + CardiovascularDisease, data=data_cal1)
@@ -205,10 +190,25 @@ confint(lm_highSig)
 plot(lm_highSig)
 ```
 
+#### Modeling
+```{r}
+#vector of covariates of interest
+vec_cov <- c("Ozone", "PM2.5", "DieselPM", "LinguisticIsolation", "Poverty", "Unemployment", "LowBirthWeight")
+
+#model with only covariates of interest
+data_cal <- data_cal[,c("CensusTract", "TotalPopulation", "CaliforniaCounty", "ZIP", "NearbyCity(tohelpapproximatelocationonly)", "Longitude", "Latitude", "Ozone", "PM2.5", "DieselPM", "Asthma", "LowBirthWeight","LinguisticIsolation", "Poverty", "Unemployment" )]
+data_cal1 <- na.omit(data_cal)
+
+#check proportion of missing values
+sum(!complete.cases(data_cal))/nrow(data_cal)
+```
+
+
+##### Linear, additive, or other models (LASSO, ridge)
 
 ```{r}
 #add spline term to every term with significance level <2e-16 & PM2.5
-model_spline=lm(Asthma~bSpline(Ozone,df=4) + bSpline(PM2.5, df=4) + bSpline(DieselPM, df=4) + bSpline(DrinkingWater, df=4) + Tox.Release + CleanupSites + GroundwaterThreats + Imp.WaterBodies + PollutionBurden + bSpline(LinguisticIsolation, df=4) + bSpline(Poverty, df=4) + bSpline(Unemployment, df=4) + bSpline(LowBirthWeight, df=4) + bSpline(CardiovascularDisease, df=4), data=data_cal1)
+model_spline=lm(Asthma~bSpline(Ozone,df=4) + bSpline(PM2.5, df=4) + bSpline(DieselPM, df=4) + bSpline(LinguisticIsolation, df=4) + bSpline(Poverty, df=4) + bSpline(Unemployment, df=4) + bSpline(LowBirthWeight, df=4), data=data_cal1)
 summary(model_spline)
 #model evaluation
 plot(model_spline)
@@ -220,7 +220,7 @@ library(dplyr)
 #define outcome variable
 y <- data_cal1 |> select(Asthma) |> scale(center = TRUE, scale = FALSE) |> as.matrix()
 #define matrix of predictor variables
-x <- data_cal1[, c("Ozone", "PM2.5", "DieselPM", "DrinkingWater", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight", "CardiovascularDisease")] |> as.matrix()
+x <- data_cal1[, c("Ozone", "PM2.5", "DieselPM", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight")] |> as.matrix()
 library(glmnet)
 #fit ridge regression model
 lambda_seq <- 10^seq(2, -2, by = -.1)
@@ -262,7 +262,7 @@ library(vip)
 elasticnet.mod = glmnet(x,y,alpha=0.5,family="gaussian",lambda = lambda_grid)
 vip(elasticnet.mod, num_features=10, geom = "point")
 #now we look at the Variable importance (vip) for factors excluding Ozone
-x_noOzone <- data_cal1[, c("PM2.5", "DieselPM", "DrinkingWater", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight", "CardiovascularDisease")] |> as.matrix()
+x_noOzone <- data_cal1[, c("PM2.5", "DieselPM", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight")] |> as.matrix()
 elasticnet.mod.noOzone = glmnet(x_noOzone,y,alpha=0.5,family="gaussian",lambda = lambda_grid)
 vip(elasticnet.mod.noOzone, num_features=10, geom = "point")
 ```
