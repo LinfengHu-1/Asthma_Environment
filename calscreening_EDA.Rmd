@@ -268,12 +268,6 @@ elasticnet.mod.noOzone = glmnet(x_noOzone,y,alpha=0.5,family="gaussian",lambda =
 vip(elasticnet.mod.noOzone, num_features=10, geom = "point")
 ```
 
-
-##### Logistic, Multinomial, Ordinal Model
-```{r}
-
-```
-
 ##### Poisson
 ```{r}
 
