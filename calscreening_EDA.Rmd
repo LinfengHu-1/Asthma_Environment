@@ -206,11 +206,23 @@ sum(!complete.cases(data_cal))/nrow(data_cal)
 
 
 ##### Linear, additive, or other models (LASSO, ridge)
+```{r}
+library(glmnet)
+library(vip)
+elasticnet.mod = glmnet(x,y,alpha=0.5,family="gaussian")
+vip(elasticnet.mod, num_features=10, geom = "point")
+#now we look at the Variable importance (vip) for factors excluding Ozone
+x_noOzone <- data_cal1[, c("PM2.5", "DieselPM", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight")] |> as.matrix()
+elasticnet.mod.noOzone = glmnet(x_noOzone,y,alpha=0.5,family="gaussian")
+vip(elasticnet.mod.noOzone, num_features=10, geom = "point")
+
+```
 
 ```{r}
 #linear model with all linear terms for 7 covariates of interest
 lm_7linear = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight, data=data_cal1)
 summary(lm_7linear)
+plot(lm_7linear)
 ```
 
 ```{r}
@@ -234,43 +246,28 @@ fit = lm.ridge(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Pov
 summary(fit)
 ```
 
-
-```{r}
-library(glmnet)
-library(vip)
-elasticnet.mod = glmnet(x,y,alpha=0.5,family="gaussian")
-vip(elasticnet.mod, num_features=10, geom = "point")
-#now we look at the Variable importance (vip) for factors excluding Ozone
-x_noOzone <- data_cal1[, c("PM2.5", "DieselPM", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight")] |> as.matrix()
-elasticnet.mod.noOzone = glmnet(x_noOzone,y,alpha=0.5,family="gaussian")
-vip(elasticnet.mod.noOzone, num_features=10, geom = "point")
-```
-More quadratic & flexible modeling:
+More flexible modeling:
 ```{r}
 #interaction terms
 lm_interAir = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + Ozone*PM2.5, data=data_cal1)
-
 lm_interDiesel = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + Ozone*DieselPM, data=data_cal1)
-
 lm_interLing = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + Ozone*LinguisticIsolation, data=data_cal1)
-
 lm_interPov = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + Ozone*Poverty, data=data_cal1)
-
 lm_interEmp = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + Ozone*Unemployment, data=data_cal1)
-
 lm_interWgt = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + Ozone*LowBirthWeight, data=data_cal1)
-
 lm_interSoc = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + Poverty*Unemployment, data=data_cal1)
 
-mods_linear <- list(lm_7linear, model_spline, lm_interWgt, lm_interEmp, lm_interPov, lm_interLing, lm_interDiesel, lm_interSoc, lm_interAir)
-
-library(AICcmodavg)
-aictab(cand.set = mods_linear)
+#quadratic terms
+lm_quadOzone = lm(AsthmaPctl ~ Ozone + I(Ozone)^2+PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight, data=data_cal1)
+lm_quadWgt = lm(AsthmaPctl ~ Ozone + I(LowBirthWeight)^2 + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight, data=data_cal1)
 ```
 
 Model comparison:
 ```{r}
+mods_linear <- list(lm_7linear, model_spline, lm_interWgt, lm_interEmp, lm_interPov, lm_interLing, lm_interDiesel, lm_interSoc, lm_interAir)
 
+library(AICcmodavg)
+aictab(cand.set = mods_linear)
 ```
 
 
