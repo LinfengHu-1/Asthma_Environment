@@ -299,10 +299,12 @@ summary(mod.poisson.full)
 
 
 sort(coef(mod.poisson.full) , decreasing = TRUE)
-
+plot(mod.poisson.full)
 
 ```
 
+```{r}
+```
 
 
 From the summary statistics of the full model, the Cardiovascular Disease, Low Birth Weight and PM 2.5 are the three major contributors to Asthma rate, using Poisson models. 
