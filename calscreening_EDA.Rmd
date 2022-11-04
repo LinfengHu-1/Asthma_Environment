@@ -226,6 +226,10 @@ plot(lm_7linear)
 ```
 
 ```{r}
+library(splines2)
+library(foreign)
+library(gam)
+library(Hmisc)
 #add spline term to every term with significance level <2e-16 & PM2.5
 model_spline=lm(AsthmaPctl ~ bSpline(Ozone,df=4) + bSpline(PM2.5, df=4) + bSpline(DieselPM, df=4) + bSpline(LinguisticIsolation, df=4) + bSpline(Poverty, df=4) + bSpline(Unemployment, df=4) + bSpline(LowBirthWeight, df=4), data=data_cal1)
 summary(model_spline)
@@ -264,10 +268,14 @@ lm_quadWgt = lm(AsthmaPctl ~ Ozone + I(LowBirthWeight)^2 + PM2.5 + DieselPM + Li
 
 Model comparison:
 ```{r}
-mods_linear <- list(lm_7linear, model_spline, lm_interWgt, lm_interEmp, lm_interPov, lm_interLing, lm_interDiesel, lm_interSoc, lm_interAir)
+mods_linear <- list(lm_7linear, model_spline, lm_interWgt, lm_interEmp, lm_interPov, lm_interLing, lm_interDiesel, lm_interSoc, lm_interAir, lm_quadOzone, lm_quadWgt)
+mod_names <- c("7Linear", "spline", "interWgt", "interEmp", "interPov", "interLing", "interDiesel", "internSoc", "interAir", "quadOzon", "quadWgt")
 
 library(AICcmodavg)
-aictab(cand.set = mods_linear)
+aictab(cand.set = mods_linear, modnames = mod_names)
+
+r_square <- c(summary(lm_7linear)$adj.r.squared, summary(model_spline)$adj.r.squared, summary(lm_interWgt)$adj.r.squared, summary(lm_interEmp)$adj.r.squared, summary(lm_interPov)$adj.r.squared, summary(lm_interLing)$adj.r.squared, summary(lm_interDiesel)$adj.r.squared, summary(lm_interSoc)$adj.r.squared, summary(lm_interAir)$adj.r.squared, summary(lm_quadOzone)$adj.r.squared, summary(lm_quadWgt)$adj.r.squared)
+cbind(mod_names,r_square)
 ```
 
 
