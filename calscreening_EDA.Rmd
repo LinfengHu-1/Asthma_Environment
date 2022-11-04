@@ -107,6 +107,7 @@ pairs(Asthma ~ Education + LinguisticIsolation + Poverty + Unemployment + Housin
 #forward selection
 require(broom)
 data_cal1 <- na.omit(data_cal)
+data_cal_old <- data_cal1
 #forward selection procedure using AIC values 
 lm1 <- lm(Asthma ~ 1, data=data_cal1)
 stepModel <- step(lm1, direction="forward",
@@ -148,34 +149,18 @@ dat_NA <- data_cal[!complete.cases(data_cal), ]
 rowSums(is.na(dat_NA))
 #look at missing pattern
 library(ggmice)
-dat <- data_cal |> select(Asthma, Ozone, PM2.5, DieselPM, DrinkingWater, Poverty, Unemployment, LowBirthWeight, CardiovascularDisease)
+dat <- data_cal[,c("Asthma", "Ozone", "PM2.5", "DieselPM","Poverty", "Unemployment",  "LowBirthWeight")]
 plot_pattern(dat)
 ```
 ```{r}
 #Attempt Multivariate Imputation
 library(mice)
-tempData = mice(dat, m = 5, maxit = 25, seed = 210)
+tempData = mice(dat, m = 5, maxit = 10, seed = 210)
 summary(tempData)
 complete(tempData,action=1)
 ```
-
-
-#### Modeling
 ```{r}
-#vector of covariates of interest
-vec_cov <- c("Ozone", "PM2.5", "DieselPM", "LinguisticIsolation", "Poverty", "Unemployment", "LowBirthWeight")
-
-#model with only covariates of interest
-data_cal <- data_cal[,c("CensusTract", "TotalPopulation", "CaliforniaCounty", "ZIP", "NearbyCity(tohelpapproximatelocationonly)", "Longitude", "Latitude", "Ozone", "PM2.5", "DieselPM", "Asthma", "LowBirthWeight","LinguisticIsolation", "Poverty", "Unemployment" )]
-
-#check proportion of missing values
-sum(!complete.cases(data_cal))/nrow(data_cal)
-```
-
-
-##### Linear, additive, or other models (LASSO, ridge)
-```{r}
-lm_pureLinear = lm(Asthma ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + Tox.Release + Traffic + CleanupSites + GroundwaterThreats + Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + Poverty + Unemployment + HousingBurden + LowBirthWeight + CardiovascularDisease, data=data_cal1)
+lm_pureLinear = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + Tox.Release + Traffic + CleanupSites + GroundwaterThreats + Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + Poverty + Unemployment + HousingBurden + LowBirthWeight + CardiovascularDisease, data=data_cal1)
 summary(lm_pureLinear)
 confint(lm_pureLinear)
 #Evaluation for this simple linear model
@@ -190,25 +175,63 @@ This simple linear model is unsatisfactory. We can see from the plot of Residual
 
 ```{r}
 #remove coefficients with lower significance level, include only if coefficients are coded "***" significant
-lm_rmSig = lm(Asthma ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Tox.Release + CleanupSites + GroundwaterThreats + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + CardiovascularDisease, data=data_cal1)
+lm_rmSig = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Tox.Release + CleanupSites + GroundwaterThreats + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + CardiovascularDisease, data=data_cal1)
 summary(lm_rmSig)
 confint(lm_rmSig)
 #Evaluation for this simple linear model
 plot(lm_rmSig)
 ```
+
 ```{r}
 #leave coefficients with significant level <2e-16
-lm_highSig = lm(Asthma ~ Ozone + PM2.5 + DieselPM + DrinkingWater + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + CardiovascularDisease, data=data_cal1)
+lm_highSig = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + DrinkingWater + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + CardiovascularDisease, data=data_cal1)
 summary(lm_highSig)
 confint(lm_highSig)
 #Evaluation for this simple linear model
 plot(lm_highSig)
 ```
 
+#### Modeling
+```{r}
+#vector of covariates of interest
+vec_cov <- c("Ozone", "PM2.5", "DieselPM", "LinguisticIsolation", "Poverty", "Unemployment", "LowBirthWeight")
+
+#model with only covariates of interest
+data_cal <- data_cal[,c("CensusTract", "TotalPopulation", "CaliforniaCounty", "ZIP", "NearbyCity(tohelpapproximatelocationonly)", "Longitude", "Latitude", "Ozone", "PM2.5", "DieselPM", "Asthma","AsthmaPctl", "LowBirthWeight","LinguisticIsolation", "Poverty", "Unemployment" )]
+data_cal1 <- na.omit(data_cal)
+
+#check proportion of missing values
+sum(!complete.cases(data_cal))/nrow(data_cal)
+```
+
+
+##### Linear, additive, or other models (LASSO, ridge)
+```{r}
+library(glmnet)
+library(vip)
+elasticnet.mod = glmnet(x,y,alpha=0.5,family="gaussian")
+vip(elasticnet.mod, num_features=10, geom = "point")
+#now we look at the Variable importance (vip) for factors excluding Ozone
+x_noOzone <- data_cal1[, c("PM2.5", "DieselPM", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight")] |> as.matrix()
+elasticnet.mod.noOzone = glmnet(x_noOzone,y,alpha=0.5,family="gaussian")
+vip(elasticnet.mod.noOzone, num_features=10, geom = "point")
+
+```
 
 ```{r}
+#linear model with all linear terms for 7 covariates of interest
+lm_7linear = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight, data=data_cal1)
+summary(lm_7linear)
+plot(lm_7linear)
+```
+
+```{r}
+library(splines2)
+library(foreign)
+library(gam)
+library(Hmisc)
 #add spline term to every term with significance level <2e-16 & PM2.5
-model_spline=lm(Asthma~bSpline(Ozone,df=4) + bSpline(PM2.5, df=4) + bSpline(DieselPM, df=4) + bSpline(DrinkingWater, df=4) + Tox.Release + CleanupSites + GroundwaterThreats + Imp.WaterBodies + PollutionBurden + bSpline(LinguisticIsolation, df=4) + bSpline(Poverty, df=4) + bSpline(Unemployment, df=4) + bSpline(LowBirthWeight, df=4) + bSpline(CardiovascularDisease, df=4), data=data_cal1)
+model_spline=lm(AsthmaPctl ~ bSpline(Ozone,df=4) + bSpline(PM2.5, df=4) + bSpline(DieselPM, df=4) + bSpline(LinguisticIsolation, df=4) + bSpline(Poverty, df=4) + bSpline(Unemployment, df=4) + bSpline(LowBirthWeight, df=4), data=data_cal1)
 summary(model_spline)
 #model evaluation
 plot(model_spline)
@@ -218,60 +241,46 @@ plot(model_spline)
 #Ridge
 library(dplyr)
 #define outcome variable
-y <- data_cal1 |> select(Asthma) |> scale(center = TRUE, scale = FALSE) |> as.matrix()
+y <- data_cal1[,"AsthmaPctl"] |> as.matrix()
 #define matrix of predictor variables
-x <- data_cal1[, c("Ozone", "PM2.5", "DieselPM", "DrinkingWater", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight", "CardiovascularDisease")] |> as.matrix()
-library(glmnet)
-#fit ridge regression model
-lambda_seq <- 10^seq(2, -2, by = -.1)
-mod_ridge <- glmnet(x, y,alpha=0.5,family="gaussian",lambda = lambda_seq)
-best_lambda <- mod_ridge$lambda.min
-best_lambda
-
-
-# library(MASS)
-# fit = lm.ridge(Asthma ~ Ozone + PM2.5 + DieselPM + DrinkingWater + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + CardiovascularDisease, data_cal1, lambda = seq(0, .4, 1e-3))
-# par(mar = c(4, 4, 0, 0), cex = 0.7, las = 1)
-# matplot(fit$lambda, coef(fit), type = "l", ylim = c(-1, 3),
-#         xlab = expression(lambda), ylab = expression(hat(beta)))
-
-
+x <- data_cal1[, c("Ozone", "PM2.5", "DieselPM", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight")] |> as.matrix()
+library(MASS)
+fit = lm.ridge(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight, data_cal1, lambda = seq(0, .4, 1e-3))
 #view summary of model
 summary(fit)
-plot(fit)
 ```
 
-
+More flexible modeling:
 ```{r}
-#Elastic Net
-# library(caret)
-# # Model Building : Elastic Net Regression
-# control <- trainControl(method = "repeatedcv", number = 5, repeats = 5, search = "random", verboseIter = TRUE)
-# # Training elastic Net Regression model
-# elastic_model <- train(Asthma ~ ., data = cbind(x, y), method = "glmnet", preProcess = c("center", "scale"), tuneLength = 25,trControl = control)
-# #elastic_model
-# # Model Prediction
-# x_hat_pre <- predict(elastic_model, y)
-# x_hat_pre
-# # Multiple R-squared
-# rsq <- cor(x, x_hat_pre)^2
-# rsq
-# # Plot
-# plot(elastic_model, main = "Elastic Net Regression")
-library(vip)
-elasticnet.mod = glmnet(x,y,alpha=0.5,family="gaussian",lambda = lambda_grid)
-vip(elasticnet.mod, num_features=10, geom = "point")
-#now we look at the Variable importance (vip) for factors excluding Ozone
-x_noOzone <- data_cal1[, c("PM2.5", "DieselPM", "DrinkingWater", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight", "CardiovascularDisease")] |> as.matrix()
-elasticnet.mod.noOzone = glmnet(x_noOzone,y,alpha=0.5,family="gaussian",lambda = lambda_grid)
-vip(elasticnet.mod.noOzone, num_features=10, geom = "point")
+#interaction terms
+lm_interAir = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + Ozone*PM2.5, data=data_cal1)
+lm_interDiesel = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + Ozone*DieselPM, data=data_cal1)
+lm_interLing = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + Ozone*LinguisticIsolation, data=data_cal1)
+lm_interPov = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + Ozone*Poverty, data=data_cal1)
+lm_interEmp = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + Ozone*Unemployment, data=data_cal1)
+lm_interWgt = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + Ozone*LowBirthWeight, data=data_cal1)
+lm_interSoc = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight + Poverty*Unemployment, data=data_cal1)
+
+#quadratic terms
+lm_quadOzone = lm(AsthmaPctl ~ Ozone + I(Ozone)^2+PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight, data=data_cal1)
+lm_quadWgt = lm(AsthmaPctl ~ Ozone + I(LowBirthWeight)^2 + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight, data=data_cal1)
 ```
 
-
-##### Logistic, Multinomial, Ordinal Model
+Model comparison:
 ```{r}
+mods_linear <- list(lm_7linear, model_spline, lm_interWgt, lm_interEmp, lm_interPov, lm_interLing, lm_interDiesel, lm_interSoc, lm_interAir, lm_quadOzone, lm_quadWgt)
+mod_names <- c("7Linear", "spline", "interWgt", "interEmp", "interPov", "interLing", "interDiesel", "internSoc", "interAir", "quadOzon", "quadWgt")
 
+library(AICcmodavg)
+aictab(cand.set = mods_linear, modnames = mod_names)
+
+r_square <- c(summary(lm_7linear)$adj.r.squared, summary(model_spline)$adj.r.squared, summary(lm_interWgt)$adj.r.squared, summary(lm_interEmp)$adj.r.squared, summary(lm_interPov)$adj.r.squared, summary(lm_interLing)$adj.r.squared, summary(lm_interDiesel)$adj.r.squared, summary(lm_interSoc)$adj.r.squared, summary(lm_interAir)$adj.r.squared, summary(lm_quadOzone)$adj.r.squared, summary(lm_quadWgt)$adj.r.squared)
+cbind(mod_names,r_square)
+
+f_score <- c(summary(lm_7linear)$fstatistic[1], summary(model_spline)$fstatistic[1], summary(lm_interWgt)$fstatistic[1], summary(lm_interEmp)$fstatistic[1], summary(lm_interPov)$fstatistic[1], summary(lm_interLing)$fstatistic[1], summary(lm_interDiesel)$fstatistic[1], summary(lm_interSoc)$fstatistic[1], summary(lm_interAir)$fstatistic[1], summary(lm_quadOzone)$fstatistic[1], summary(lm_quadWgt)$fstatistic[1])
+cbind(mod_names, f_score)
 ```
+
 
 ##### Poisson
 ```{r}
@@ -279,7 +288,7 @@ vip(elasticnet.mod.noOzone, num_features=10, geom = "point")
 library(dplyr)
 library(tidyverse)
 #round the Asthma rate to make sure that it's integers
-dataint <- data_cal1 |> mutate(Asthma = round(Asthma))
+dataint <- data_cal_old |> mutate(Asthma = round(Asthma))
 
 mod.poisson.full <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + 
     Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
@@ -488,27 +497,17 @@ print(round(results, digits=digits))
 }
 }
 
-mod.multi <- multinom(asthma_cat ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + 
-    Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
-    Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + 
-    Poverty + Unemployment + HousingBurden + LowBirthWeight + 
-    CardiovascularDisease, data=data_cal)
+mod.multi <- multinom(asthma_cat ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment + LowBirthWeight, data=data_cal)
 
 summ.MNfit(mod.multi)
 
-mod.ord <- vglm(asthma_cat ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + 
-    Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
-    Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + 
-    Poverty + Unemployment + HousingBurden + LowBirthWeight + 
-    CardiovascularDisease, cumulative(parallel=TRUE, reverse=TRUE),data=data_cal)
+mod.ord <- vglm(asthma_cat ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment + LowBirthWeight, cumulative(parallel=TRUE, reverse=TRUE),data=data_cal)
 
 summary(mod.ord)
 
-mod.ord.npo <- vglm(asthma_cat ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + 
-    Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
-    Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + 
-    Poverty + Unemployment + HousingBurden + LowBirthWeight + 
-    CardiovascularDisease, cumulative(parallel=FALSE, reverse=TRUE),data=data_cal)
+mod.ord.npo <- vglm(asthma_cat ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight, cumulative(parallel=FALSE, reverse=TRUE),data=data_cal)
 
 pchisq(deviance(mod.ord)-deviance(mod.ord.npo), df=df.residual(mod.ord)-df.residual(mod.ord.npo),lower.tail=F)
 #proportional odds does not hold --> use multinomial
