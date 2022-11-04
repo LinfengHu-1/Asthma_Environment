@@ -276,6 +276,9 @@ aictab(cand.set = mods_linear, modnames = mod_names)
 
 r_square <- c(summary(lm_7linear)$adj.r.squared, summary(model_spline)$adj.r.squared, summary(lm_interWgt)$adj.r.squared, summary(lm_interEmp)$adj.r.squared, summary(lm_interPov)$adj.r.squared, summary(lm_interLing)$adj.r.squared, summary(lm_interDiesel)$adj.r.squared, summary(lm_interSoc)$adj.r.squared, summary(lm_interAir)$adj.r.squared, summary(lm_quadOzone)$adj.r.squared, summary(lm_quadWgt)$adj.r.squared)
 cbind(mod_names,r_square)
+
+f_score <- c(summary(lm_7linear)$fstatistic[1], summary(model_spline)$fstatistic[1], summary(lm_interWgt)$fstatistic[1], summary(lm_interEmp)$fstatistic[1], summary(lm_interPov)$fstatistic[1], summary(lm_interLing)$fstatistic[1], summary(lm_interDiesel)$fstatistic[1], summary(lm_interSoc)$fstatistic[1], summary(lm_interAir)$fstatistic[1], summary(lm_quadOzone)$fstatistic[1], summary(lm_quadWgt)$fstatistic[1])
+cbind(mod_names, f_score)
 ```
 
 
