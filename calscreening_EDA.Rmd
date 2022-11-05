@@ -280,6 +280,12 @@ cbind(mod_names,r_square)
 f_score <- c(summary(lm_7linear)$fstatistic[1], summary(model_spline)$fstatistic[1], summary(lm_interWgt)$fstatistic[1], summary(lm_interEmp)$fstatistic[1], summary(lm_interPov)$fstatistic[1], summary(lm_interLing)$fstatistic[1], summary(lm_interDiesel)$fstatistic[1], summary(lm_interSoc)$fstatistic[1], summary(lm_interAir)$fstatistic[1], summary(lm_quadOzone)$fstatistic[1], summary(lm_quadWgt)$fstatistic[1])
 cbind(mod_names, f_score)
 ```
+Further interpretation of lm_interAir
+```{r}
+summary(lm_interAir)
+plot(lm_interAir)
+```
+
 
 
 ##### Poisson
