@@ -305,10 +305,12 @@ summary(mod.poisson.full)
 
 
 sort(coef(mod.poisson.full) , decreasing = TRUE)
-
+plot(mod.poisson.full)
 
 ```
 
+```{r}
+```
 
 
 From the summary statistics of the full model, the Cardiovascular Disease, Low Birth Weight and PM 2.5 are the three major contributors to Asthma rate, using Poisson models. 
@@ -440,11 +442,23 @@ anova(mod.poisson.sim,mod.poisson.qua, test ='Chisq')
 
 Since the p-value is lower than zero, it's sufficient for us to reject the null hypothesis. Thus, the model with quadratic terms is better in predicting Asthma rate, as compared to the simple model. 
 
+Examining the effects of interactionterms between PM 2.5 and DieselPM:
+```{r}
+mod.poisson.qua1 <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment+ LowBirthWeight  + I(Ozone^2) + I(PM2.5^2) + I(DieselPM ^2) + PM2.5*DieselPM, data=dataint, family=quasipoisson)
+summary(mod.poisson.qua1)
 
+```
+The interaction term of PM2.5 and DieselPM does not have a p-value as significant as the other terms, butthe chisq test betweeb the model with the interaction vs not has a p-value under the significance leve, which indicates that it's not sufficient to reject the null hypothesis that the interaction term is significant in terms of predicting the Asthma rate .
+
+```{r}
+anova(mod.poisson.qua,mod.poisson.qua1, test ='Chisq')
+```
 
 Check for overdispersion:
 ```{r}
 summary(mod.poisson.qua)$dispersion
+summary(mod.poisson.qua1)$dispersion
 summary(mod.poisson.sim)$dispersion
 ```
 The quadratic model has smaller overdispersion quotient than the linear model, which indicates that it has better goodness of fit. 
@@ -453,7 +467,7 @@ Next: to remedy for the overdispersion effects, we consider incorporating the ne
 
 ```{r}
 nbin1 <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
-    Poverty + Unemployment+ LowBirthWeight +  I(Ozone^2) + I(PM2.5^2) + I(DieselPM ^2), data = dataint)
+    Poverty + Unemployment+ LowBirthWeight +  I(Ozone^2) + I(PM2.5^2) + I(DieselPM ^2) + PM2.5 * DieselPM, data = dataint)
 summary(nbin1)
 ```
 ```{r}
