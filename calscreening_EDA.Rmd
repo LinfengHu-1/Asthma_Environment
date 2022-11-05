@@ -309,8 +309,6 @@ plot(mod.poisson.full)
 
 ```
 
-```{r}
-```
 
 
 From the summary statistics of the full model, the Cardiovascular Disease, Low Birth Weight and PM 2.5 are the three major contributors to Asthma rate, using Poisson models. 
@@ -382,11 +380,7 @@ From the summary statistics: we can see that with every 1 more unit increase in 
 
 Something to note: Ozone showed a very significant positive association with Asthma rate when modeled with Asthma rate alone, but showed negative association in the full model, which is open for later discussion and examinations. 
 
-```{r}
 
-```
-
-<<<<<<< HEAD
 Testing whether we can use low birth weight as predictors for Asthma rate:
 ```{r}
 
@@ -474,7 +468,9 @@ summary(nbin1)
 summary(nbin1)$dispersion
 ```
 The negative binomial model has dispersion quotient of 1, and all the terms are statistically significant with p-values much smaller than the 0.05 threshold. Thus, it's a desirable model at this step. 
-=======
+
+
+Multinomial Regression Testing:
 
 ```{r}
 #multinomial regression
@@ -523,4 +519,3 @@ pchisq(deviance(mod.ord)-deviance(mod.ord.npo), df=df.residual(mod.ord)-df.resid
 
 ```
 
->>>>>>> b70d94225c7403cb1e4019b4f16bd84c3b2b3a43
