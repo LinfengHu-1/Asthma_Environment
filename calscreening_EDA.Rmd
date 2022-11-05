@@ -25,7 +25,7 @@ library(VGAM)
 
 ```{r}
 data_cal <- read_csv('calenviroscreen-3.0-results-june-2018-update.csv')
-data_cal
+#data_cal
 ```
 
 
@@ -37,7 +37,7 @@ summary(data_cal)
 #names(data_cal)
 colnames(data_cal) <- gsub(" ", "", colnames(data_cal))
 colnames(data_cal) <- gsub("\n", "", colnames(data_cal))
-names(data_cal)
+#names(data_cal)
 ```
 ***
 columns for diseases: Asthma LowBirthWeight CardiovascularDisease
@@ -157,7 +157,7 @@ plot_pattern(dat)
 library(mice)
 tempData = mice(dat, m = 5, maxit = 10, seed = 210)
 summary(tempData)
-complete(tempData,action=1)
+#complete(tempData,action=1)
 ```
 ```{r}
 lm_pureLinear = lm(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + DrinkingWater + Pesticides + Tox.Release + Traffic + CleanupSites + GroundwaterThreats + Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + Poverty + Unemployment + HousingBurden + LowBirthWeight + CardiovascularDisease, data=data_cal1)
