@@ -209,6 +209,10 @@ sum(!complete.cases(data_cal))/nrow(data_cal)
 ```{r}
 library(glmnet)
 library(vip)
+#define outcome variable
+y <- data_cal1[,"AsthmaPctl"] |> as.matrix()
+#define matrix of predictor variables
+x <- data_cal1[, c("Ozone", "PM2.5", "DieselPM", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight")] |> as.matrix()
 elasticnet.mod = glmnet(x,y,alpha=0.5,family="gaussian")
 vip(elasticnet.mod, num_features=10, geom = "point")
 #now we look at the Variable importance (vip) for factors excluding Ozone
@@ -240,10 +244,6 @@ plot(model_spline)
 ```{r}
 #Ridge
 library(dplyr)
-#define outcome variable
-y <- data_cal1[,"AsthmaPctl"] |> as.matrix()
-#define matrix of predictor variables
-x <- data_cal1[, c("Ozone", "PM2.5", "DieselPM", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight")] |> as.matrix()
 library(MASS)
 fit = lm.ridge(AsthmaPctl ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment + LowBirthWeight, data_cal1, lambda = seq(0, .4, 1e-3))
 #view summary of model
