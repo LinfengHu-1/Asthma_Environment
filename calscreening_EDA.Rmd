@@ -2,7 +2,7 @@
 title: "calscreening2018"
 author: "Group 21; Group name: 21 and me; Members: Pluto Zhang, Linfeng Hu, Cynthia Ma"
 date: "2022-10-26"
-output: html_document
+output: pdf_document
 ---
 
 ```{r}
