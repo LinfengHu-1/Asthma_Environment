@@ -78,7 +78,8 @@ hist(data_cal$Pesticides, main='Histogram of state-level Pesticides concentratio
 hist(data_cal$Tox.Release, main='Histogram of state-level Toxin concentration in the air' )
 
 
-pairs(Asthma ~ Ozone + PM2.5 + DieselPM + Pesticides + Tox.Release , dat = data_cal)
+pairs(Asthma ~ Ozone + PM2.5 + DieselPM + Pesticides + Tox.Release + Traffic+ CleanupSites + GroundwaterThreats + Haz.Waste +Imp.WaterBodies
++ SolidWaste + PollutionBurden, dat = data_cal)
 ```
 
 # for other diseases
