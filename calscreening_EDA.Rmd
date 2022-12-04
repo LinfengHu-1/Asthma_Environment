@@ -150,7 +150,7 @@ dat_NA <- data_cal[!complete.cases(data_cal), ]
 rowSums(is.na(dat_NA))
 #look at missing pattern
 library(ggmice)
-dat <- data_cal[,c("Asthma", "Ozone", "PM2.5", "DieselPM","Poverty", "Unemployment",  "LowBirthWeight")]
+dat <- data_cal[,c("Asthma", "Ozone", "PM2.5", "DieselPM","Poverty", "Unemployment",  "LowBirthWeight", "LinguisticIsolation")]
 plot_pattern(dat)
 ```
 ```{r}
@@ -649,5 +649,11 @@ MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation +
 #yourcodeeee
 MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
     Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + PM2.5*Ozone, data=dataint)
+
+
+#multiple imputed data
+dataint_imputed <- tempData$data |> mutate(Asthma = round(Asthma)) |> mutate(logAsthma = log(Asthma))
+MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + PM2.5*Ozone, data=dataint_imputed)
 ```
 
