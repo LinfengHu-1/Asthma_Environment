@@ -456,7 +456,7 @@ Next: we select the best model thus far by looking at the the dispersion quotien
 Here we examine the dispersion quotients of all the models above to select for the best one:
 
 ```{r}
-modnames <- c('mod.poisson.sim','modp.pm_ozone','modp.ozone_diesel','modp.ozone_linguisticIsolation','modp.ozone_poverty','modp.ozone_lowbirthweight','mod.poisson.qua','mod.poisson.qua.pm2.5ozone')
+modnames <- c('poisson.simple','pm_ozone interaction ','ozone_diesel interaction','ozone_linguisticIsolation interaction','ozone_poverty interaction','ozone_lowbirthweight interaction','poisson quadratic ozone ','quadratic+pm2.5_ozone interaction')
 poisson_model_aics <- c(summary(mod.poisson.sim)$aic,
 summary(modp.pm_ozone)$aic,
 summary(modp.ozone_diesel)$aic,
@@ -548,11 +548,36 @@ anova(modnb.poisson.qua,modnb.poisson.qua.pm2.5ozone)
 The P-value is significant: indicating that the interaction term is significant.
 
 The final model: 
+MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + PM2.5*Ozone, data=dataint)
 
 
 Make a table that incorporates all the models' original dispersion, original AIC, negative binomical dispersion and negative binomial AIC
 ```{r}
+nb_aics <- c(summary(modnb.poisson.sim)$aic,
+summary(modnb.pm_ozone)$aic,
+summary(modnb.ozone_diesel)$aic,
+summary(modnb.ozone_linguisticIsolation)$aic,
+summary(modnb.ozone_poverty)$aic,
+summary(modnb.ozone_lowbirthweight)$aic,
+summary(modnb.poisson.qua)$aic,
+summary(modnb.poisson.qua.pm2.5ozone)$aic)
 
+
+nb_dispersions <- c(
+  deviance(modnb.poisson.sim)/modnb.poisson.sim$df.residual,
+  deviance(modnb.pm_ozone)/modnb.pm_ozone$df.residual,
+  deviance(modnb.ozone_diesel)/modnb.ozone_diesel$df.residual,
+  deviance(modnb.ozone_linguisticIsolation)/modnb.ozone_linguisticIsolation$df.residual,
+  deviance(modnb.ozone_poverty)/modnb.ozone_poverty$df.residual,
+  deviance(modnb.ozone_lowbirthweight)/modnb.ozone_lowbirthweight$df.residual,
+  deviance(modnb.poisson.qua)/modnb.poisson.qua$df.residual,
+  deviance(modnb.poisson.qua.pm2.5ozone)/modnb.poisson.qua.pm2.5ozone$df.residual
+)
+
+
+all_vec <- cbind(poisson_vec,nb_aics,nb_dispersions)
+all_vec
 ```
 
 
@@ -603,5 +628,20 @@ pchisq(deviance(mod.ord)-deviance(mod.ord.npo), df=df.residual(mod.ord)-df.resid
 #proportional odds does not hold --> use multinomial
 
 
+```
+
+
+
+
+#Sensitivity Analysis
+
+The final model: 
+MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + PM2.5*Ozone, data=dataint)
+
+```{r}
+#yourcodeeee
+MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + PM2.5*Ozone, data=dataint)
 ```
 
