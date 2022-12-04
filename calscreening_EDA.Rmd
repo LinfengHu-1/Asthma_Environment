@@ -316,7 +316,7 @@ plot(mod.poisson.full)
 From the summary statistics of the full model, the Cardiovascular Disease, Low Birth Weight and PM 2.5 are the three major contributors to Asthma rate, using Poisson models. 
 While Ozone is the factor that is negatively correlated with Asthma rate, as is shown in the linear model. 
 
-Since pesticides, traffic, Haz.waste, Imp.WaterBodies, PollutionBurden and Housing burden variables have both relatively lower p-values and small 
+Since pesticides, traffic, Haz.waste, Imp.WaterBodies, PollutionBurden and Housing burden variables have  relatively lower p-values they are excluded from the analysis
 Since drinking water, cleanup sites and Ground Water threats have relatively very low coefficients, we exclude their effects for the next round of analysis.  
 
 Thus, what we keep for the next round of analysis are 8 variables: PM2.5, Ozone, DieselPM, Unemployment, Poverty, Linguistic Isolation, Low Birth Weight and Cardiovascular Diseases.
@@ -339,11 +339,11 @@ First, assess which variable among the remaining variables is the most influenti
 
 yp <- dataint[,"logAsthma"] |> as.matrix()
 #define matrix of predictor variables
-xp <- dataint[, c("Ozone", "PM2.5", "DieselPM", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight")] |> as.matrix()
+xp <- dataint[, c("Ozone", "DieselPM", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight", 'DrinkingWater', 'CleanupSites', 'GroundwaterThreats')] |> as.matrix()
 elasticnetp = glmnet(xp,yp,alpha=0.5,family="gaussian")
 vip(elasticnetp, num_features=10, geom = "point")
 #now we look at the Variable importance (vip) for factors excluding Ozone
-xp_noOzone <- data_cal1[, c("PM2.5", "DieselPM", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight")] |> as.matrix()
+xp_noOzone <- data_cal1[, c("DieselPM", "LinguisticIsolation",  "Poverty", "Unemployment", "LowBirthWeight")] |> as.matrix()
 elasticnetp.noOzone = glmnet(x_noOzone,y,alpha=0.5,family="gaussian")
 vip(elasticnetp.noOzone, num_features=10, geom = "point")
 ```
@@ -456,12 +456,13 @@ Next: we select the best model thus far by looking at the the dispersion quotien
 Here we examine the dispersion quotients of all the models above to select for the best one:
 
 ```{r}
-modnames <- c('poisson.simple','pm_ozone interaction ','ozone_diesel interaction','ozone_linguisticIsolation interaction','ozone_poverty interaction','ozone_lowbirthweight interaction','poisson quadratic ozone ','quadratic+pm2.5_ozone interaction')
+modnames <- c('poisson.simple','pm_ozone interaction ','ozone_diesel interaction','ozone_linguisticIsolation interaction','ozone_poverty interaction','ozone_unemployment interaction','ozone_lowbirthweight interaction','poisson quadratic ozone ','quadratic+pm2.5_ozone interaction')
 poisson_model_aics <- c(summary(mod.poisson.sim)$aic,
 summary(modp.pm_ozone)$aic,
 summary(modp.ozone_diesel)$aic,
 summary(modp.ozone_linguisticIsolation)$aic,
 summary(modp.ozone_poverty)$aic,
+summary(modp.ozone_unemployment)$aic,
 summary(modp.ozone_lowbirthweight)$aic,
 summary(mod.poisson.qua)$aic,
 summary(mod.poisson.qua.pm2.5ozone)$aic)
@@ -473,6 +474,7 @@ poisson_model_dispersions <- c(
   deviance(modp.ozone_diesel)/modp.ozone_diesel$df.residual,
   deviance(modp.ozone_linguisticIsolation)/modp.ozone_linguisticIsolation$df.residual,
   deviance(modp.ozone_poverty)/modp.ozone_poverty$df.residual,
+  deviance(modp.ozone_unemployment)/modp.ozone_unemployment$df.residual,
   deviance(modp.ozone_lowbirthweight)/modp.ozone_lowbirthweight$df.residual,
     deviance(mod.poisson.qua)/mod.poisson.qua$df.residual,
   deviance(mod.poisson.qua.pm2.5ozone)/mod.poisson.qua.pm2.5ozone$df.residual
@@ -518,6 +520,7 @@ summary(modnb.pm_ozone)$aic
 summary(modnb.ozone_diesel)$aic
 summary(modnb.ozone_linguisticIsolation)$aic
 summary(modnb.ozone_poverty)$aic
+
 summary(modnb.ozone_lowbirthweight)$aic
 ```
 
@@ -559,6 +562,7 @@ summary(modnb.pm_ozone)$aic,
 summary(modnb.ozone_diesel)$aic,
 summary(modnb.ozone_linguisticIsolation)$aic,
 summary(modnb.ozone_poverty)$aic,
+summary(modnb.ozone_unemployment)$aic,
 summary(modnb.ozone_lowbirthweight)$aic,
 summary(modnb.poisson.qua)$aic,
 summary(modnb.poisson.qua.pm2.5ozone)$aic)
@@ -570,6 +574,7 @@ nb_dispersions <- c(
   deviance(modnb.ozone_diesel)/modnb.ozone_diesel$df.residual,
   deviance(modnb.ozone_linguisticIsolation)/modnb.ozone_linguisticIsolation$df.residual,
   deviance(modnb.ozone_poverty)/modnb.ozone_poverty$df.residual,
+  deviance(modnb.ozone_unemployment)/modnb.ozone_unemployment$df.residual,
   deviance(modnb.ozone_lowbirthweight)/modnb.ozone_lowbirthweight$df.residual,
   deviance(modnb.poisson.qua)/modnb.poisson.qua$df.residual,
   deviance(modnb.poisson.qua.pm2.5ozone)/modnb.poisson.qua.pm2.5ozone$df.residual
@@ -578,6 +583,7 @@ nb_dispersions <- c(
 
 all_vec <- cbind(poisson_vec,nb_aics,nb_dispersions)
 all_vec
+
 ```
 
 
