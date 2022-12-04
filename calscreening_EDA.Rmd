@@ -355,11 +355,10 @@ First, we look at the model with the linear terms only:
 
 Looking at the simple model with only the 7 linear terms of covariates and without the interaction terms:
 ```{r}
-mod.poisson.sim <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight, data=dataint, family=quasipoisson)
+mod.poisson.sim <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight, data=dataint, family=poisson)
 summary(mod.poisson.sim)
 
-summary(mod.poisson.sim)$dispersion
-
+deviance(mod.poisson.sim)/mod.poisson.sim$df.residual
 ```
 From the summary statistics above, all the covariates are statistically significant.
 
@@ -367,12 +366,12 @@ Now let's examine the interaction terms:
 
 ```{r}
 #
-modp.pm_ozone <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * PM2.5, data=dataint, family=quasipoisson)
-modp.ozone_diesel <-glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * DieselPM, data=dataint, family=quasipoisson)
-modp.ozone_linguisticIsolation <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * LinguisticIsolation, data=dataint, family=quasipoisson)
-modp.ozone_poverty <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * Poverty, data=dataint, family=quasipoisson)
-modp.ozone_unemployment <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * Unemployment, data=dataint, family=quasipoisson)
-modp.ozone_lowbirthweight <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * LowBirthWeight, data=dataint, family=quasipoisson)
+modp.pm_ozone <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * PM2.5, data=dataint, family=poisson())
+modp.ozone_diesel <-glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * DieselPM, data=dataint, family=poisson())
+modp.ozone_linguisticIsolation <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * LinguisticIsolation, data=dataint, family=poisson())
+modp.ozone_poverty <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * Poverty, data=dataint, family=poisson())
+modp.ozone_unemployment <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * Unemployment, data=dataint, family=poisson())
+modp.ozone_lowbirthweight <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * LowBirthWeight, data=dataint, family=poisson())
 
 
 summary(modp.pm_ozone)$coefficients[,4][9]
@@ -380,59 +379,41 @@ summary(modp.ozone_diesel)$coefficients[,4][9]
 summary(modp.ozone_linguisticIsolation)$coefficients[,4][9]
 summary(modp.ozone_poverty)$coefficients[,4][9]
 summary(modp.ozone_lowbirthweight)$coefficients[,4][9]
+
+
+
 ```
 
-As can see from the table above, the interaction term of Ozone and DieselPM is not significant, but all other interaction terms have p-values lower than the significance level. 
+As can see from the table above, the interaction term of Ozone and DieselPM is at the edge of significance threshold, but all other interaction terms have p-values lower than the significance level. 
 Among these interaction terms, the term of Ozone and pm2.5 has the smallest p-value. Thus, we consider it the most significant interaction term regarding Ozone. 
 
 
-Since PM 2.5 and DieselPM are both air pollution factors, we also examine the confounding effect and interactions between these two terms. 
-
-first We want to approximate the effects of PM 2.5 and Asthma:
+We try to look at the AIC values of the models:
 ```{r}
-mod.p_base <- glm(Asthma ~ PM2.5, data=dataint, family=quasipoisson)
-summary(mod.p_base)
-exp(coef(mod.p_base)[2])
-
-#examine the dispersion 
-deviance(mod.p_base)/mod.p_base$df.residual
+summary(modp.pm_ozone)$aic
+summary(modp.ozone_diesel)$aic
+summary(modp.ozone_linguisticIsolation)$aic
+summary(modp.ozone_poverty)$aic
+summary(modp.ozone_lowbirthweight)$aic
 ```
 
-The model with Pm 2.5 alone has very great overdispersion, at the value of 15.5. 
-
-From the summary statistics: we can see that every 1 unit increase in PM 2.5 concentration is estimated to be associated with, on average, 2% increase in the incidence rate of asthma among individuals that live in the counties with the current level of PM2.5 concentration.
-
-
+The model is pretty overdispersed:
 ```{r}
-mod.p_pmd <- glm(Asthma ~ PM2.5 + DieselPM, data=dataint, family=poisson())
-summary(mod.p_pmd)
-exp(coef(mod.p_pmd)[2])
-exp(coef(mod.p_pmd)[3])
-```
-From the summary statistics: we can see that with every 1 more unit increase in PM 2.5 concentration is estimated to be associated with, on average, 1.3% increase in the incidence rate of asthma among individuals that live in the counties with the current level of PM2.5 concentration.
-
-Diesel is likely a confonder for the effects of PM 2.5, because dieselPM contributes to a portion of PM 2.5, while the total PM2.5 amount doesn't directly lead to DieselPM. 
-The changes in coefficient of PM 2.5:
-(0.02-0.013)/0.013 = 53.8% > 10%
-Thus, diesel PM satisfies the confounding effect. 
-
-Then we test the effect modifying of DieselPM:
-The interaction terms has a p-value below the significant threshold. SO we can conclude that it is an effect modifier of PM 2.5. 
-```{r}
-mod.p_pmdinter <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight +PM2.5 * DieselPM, data=dataint, family=poisson())
-summary(mod.p_pmdinter)
-deviance(mod.p_pmdinter)/mod.p_pmdinter$df.residual
-
+deviance(modp.pm_ozone)/modp.pm_ozone$df.residual
+deviance(modp.ozone_diesel)/modp.ozone_diesel$df.residual
+deviance(modp.ozone_linguisticIsolation)/modp.ozone_linguisticIsolation$df.residual
+deviance(modp.ozone_poverty)/modp.ozone_poverty$df.residual
+deviance(modp.ozone_lowbirthweight)/modp.ozone_lowbirthweight$df.residual
 ```
 
 
 
 
-Next, since PM 2.5, Diesel PM and Ozone are the air pollution factors, which are most likely to be directly associated with Asthma rate, we examine the effects of adding in the quadratic terms of these variables. 
+Next, since Ozone is the air pollution factor most likely to be directly associated with Asthma rate, we examine the effects of adding in the quadratic term. 
 
-Incoporating the quadratic terms of PM2.5, Diesel PM, Ozone into the model:
+Incoporating the quadratic terms of Ozone into the model:
 
-Hypothesis testing: comparing the linear simple model with the 8 variables, to the model that has the quadratic terms of the three environmental factors PM 2.5, Ozone and DieselPM.
+Hypothesis testing: comparing the linear simple model with the 8 variables, to the model that has the quadratic term.
 
 Hypothesis H0: this new model is better in terms of predicting the Asthma compared to the simple model
 
@@ -440,7 +421,7 @@ Hypothesis H0: this new model is better in terms of predicting the Asthma compar
 ```{r}
 
 mod.poisson.qua <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
-    Poverty + Unemployment+ LowBirthWeight  + I(Ozone^2) + I(PM2.5^2) + I(DieselPM ^2), data=dataint, family=quasipoisson)
+    Poverty + Unemployment+ LowBirthWeight  + I(Ozone^2) , data=dataint, family=poisson())
 summary(mod.poisson.qua)
 
 anova(mod.poisson.sim,mod.poisson.qua, test ='Chisq')
@@ -449,23 +430,11 @@ anova(mod.poisson.sim,mod.poisson.qua, test ='Chisq')
 
 Since the p-value is lower than 0.05, it's sufficient for us to reject the null hypothesis. Thus, the model with quadratic terms is better in predicting Asthma rate, as compared to the simple model. 
 
-Examining the effects of interactionterms between PM 2.5 and DieselPM:
-```{r}
-mod.poisson.qua.pm2.5diesel <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
-    Poverty + Unemployment+ LowBirthWeight  + I(Ozone^2) + I(PM2.5^2) + I(DieselPM ^2) + PM2.5*DieselPM, data=dataint, family=quasipoisson)
-summary(mod.poisson.qua.pm2.5diesel)
-
-```
-The interaction term of PM2.5 and DieselPM does not have a p-value as significant as the other terms, but the chisq test has a p-value under the significance level, which indicates that it's sufficient to reject the null hypothesis and conclude that the including the interaction term is better in predicting Asthma rates. 
-
-```{r}
-anova(mod.poisson.qua,mod.poisson.qua.pm2.5diesel, test ='Chisq')
-```
 
 Now examine the adding in the interaction term of PM2.5 and Ozone into the quadratic model:
 ```{r}
 mod.poisson.qua.pm2.5ozone <- glm(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
-    Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + I(PM2.5^2) + I(DieselPM ^2) + PM2.5*Ozone, data=dataint, family=quasipoisson)
+    Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + PM2.5*Ozone, data=dataint, family=poisson())
 summary(mod.poisson.qua.pm2.5ozone)
 ```
 ```{r}
@@ -476,10 +445,8 @@ from the anova tests comparing the model with the interaction term and the quadr
 
 Check for overdispersion:
 ```{r}
-summary(mod.poisson.sim)$dispersion
-summary(mod.poisson.qua)$dispersion
-summary(mod.poisson.qua.pm2.5diesel)$dispersion
-summary(mod.poisson.qua.pm2.5ozone)$dispersion
+deviance(mod.poisson.qua)/mod.poisson.qua$df.residual
+deviance(mod.poisson.qua.pm2.5ozone)/mod.poisson.qua.pm2.5ozone$df.residual
 
 ```
 The quadratic model has smaller overdispersion quotient than the linear model, which indicates that it has better goodness of fit. 
@@ -489,18 +456,30 @@ Next: we select the best model thus far by looking at the the dispersion quotien
 Here we examine the dispersion quotients of all the models above to select for the best one:
 
 ```{r}
-modnames <- c('mod.poisson.sim','modp.pm_ozone','modp.ozone_diesel','modp.ozone_linguisticIsolation','modp.ozone_poverty','modp.ozone_lowbirthweight','mod.poisson.qua','od.poisson.qua.pm2.5diesel','mod.poisson.qua.pm2.5ozone')
-poisson_model_dispersions <- c(summary(mod.poisson.sim)$dispersion,
-summary(modp.pm_ozone)$dispersion,
-summary(modp.ozone_diesel)$dispersion,
-summary(modp.ozone_linguisticIsolation)$dispersion,
-summary(modp.ozone_poverty)$dispersion,
-summary(modp.ozone_lowbirthweight)$dispersion,
-summary(mod.poisson.qua)$dispersion,
-summary(mod.poisson.qua.pm2.5diesel)$dispersion,
-summary(mod.poisson.qua.pm2.5ozone)$dispersion)
+modnames <- c('mod.poisson.sim','modp.pm_ozone','modp.ozone_diesel','modp.ozone_linguisticIsolation','modp.ozone_poverty','modp.ozone_lowbirthweight','mod.poisson.qua','mod.poisson.qua.pm2.5ozone')
+poisson_model_aics <- c(summary(mod.poisson.sim)$aic,
+summary(modp.pm_ozone)$aic,
+summary(modp.ozone_diesel)$aic,
+summary(modp.ozone_linguisticIsolation)$aic,
+summary(modp.ozone_poverty)$aic,
+summary(modp.ozone_lowbirthweight)$aic,
+summary(mod.poisson.qua)$aic,
+summary(mod.poisson.qua.pm2.5ozone)$aic)
 
-cbind(modnames,poisson_model_dispersions)
+
+poisson_model_dispersions <- c(
+  deviance(mod.poisson.sim)/mod.poisson.sim$df.residual,
+  deviance(modp.pm_ozone)/modp.pm_ozone$df.residual,
+  deviance(modp.ozone_diesel)/modp.ozone_diesel$df.residual,
+  deviance(modp.ozone_linguisticIsolation)/modp.ozone_linguisticIsolation$df.residual,
+  deviance(modp.ozone_poverty)/modp.ozone_poverty$df.residual,
+  deviance(modp.ozone_lowbirthweight)/modp.ozone_lowbirthweight$df.residual,
+    deviance(mod.poisson.qua)/mod.poisson.qua$df.residual,
+  deviance(mod.poisson.qua.pm2.5ozone)/mod.poisson.qua.pm2.5ozone$df.residual
+    
+)
+poisson_vec <- cbind(modnames,poisson_model_aics,poisson_model_dispersions)
+poisson_vec
 ```
 
 
@@ -508,15 +487,73 @@ cbind(modnames,poisson_model_dispersions)
 Next: to remedy for the overdispersion effects, we consider incorporating the negative binomial model onto the most fitted model selected above. 
 
 ```{r}
-nbin1 <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
-    Poverty + Unemployment+ LowBirthWeight +  I(Ozone^2) + I(PM2.5^2) + I(DieselPM ^2) + PM2.5 * Ozone, data = dataint)
-summary(nbin1)
+modnb.poisson.sim <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment+ LowBirthWeight, data = dataint)
+summary(modnb.poisson.sim)
 ```
 ```{r}
-summary(nbin1)$dispersion
+summary(modnb.poisson.sim)$dispersion
+deviance(modnb.poisson.sim)/modnb.poisson.sim$df.residual
 ```
 The negative binomial model has dispersion quotient of 1, and all the terms are statistically significant with p-values much smaller than the 0.05 threshold. Thus, it's a desirable model at this step. 
 
+```{r}
+modnb.pm_ozone <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * PM2.5, data=dataint)
+modnb.ozone_diesel <-MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * DieselPM, data=dataint)
+modnb.ozone_linguisticIsolation <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * LinguisticIsolation, data=dataint)
+modnb.ozone_poverty <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * Poverty, data=dataint)
+modnb.ozone_unemployment <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * Unemployment, data=dataint)
+modnb.ozone_lowbirthweight <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight + Ozone * LowBirthWeight, data=dataint)
+
+
+summary(modnb.pm_ozone)$coefficients[,4][9]
+summary(modnb.ozone_diesel)$coefficients[,4][9]
+summary(modnb.ozone_linguisticIsolation)$coefficients[,4][9]
+summary(modnb.ozone_poverty)$coefficients[,4][9]
+summary(modnb.ozone_lowbirthweight)$coefficients[,4][9]
+```
+The interaction term of ozone and PM2.5 has the smallest P-value, which is the most significant.
+```{r}
+summary(modnb.pm_ozone)$aic
+summary(modnb.ozone_diesel)$aic
+summary(modnb.ozone_linguisticIsolation)$aic
+summary(modnb.ozone_poverty)$aic
+summary(modnb.ozone_lowbirthweight)$aic
+```
+
+
+```{r}
+modnb.poisson.qua <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + Poverty + Unemployment+ LowBirthWeight  + I(Ozone^2) , data=dataint)
+summary(modnb.poisson.qua)
+
+```
+Hypothesis testing:
+1. incorporating the quadratic term of ozone and compare to the nb model with only the simple linear terms 
+```{r}
+
+anova(modnb.poisson.sim,modnb.poisson.qua, test ='Chisq')
+```
+
+
+2. Incorporating the interaction term of ozone and PM2.5
+```{r}
+modnb.poisson.qua.pm2.5ozone <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + PM2.5*Ozone, data=dataint)
+summary(modnb.poisson.qua.pm2.5ozone)
+```
+
+```{r}
+anova(modnb.poisson.qua,modnb.poisson.qua.pm2.5ozone)
+```
+The P-value is significant: indicating that the interaction term is significant.
+
+The final model: 
+
+
+Make a table that incorporates all the models' original dispersion, original AIC, negative binomical dispersion and negative binomial AIC
+```{r}
+
+```
 
 
 Multinomial Regression Testing:
