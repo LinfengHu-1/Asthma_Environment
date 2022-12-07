@@ -21,6 +21,7 @@ library(ggrepel)
 library(data.table)
 library(nnet)
 library(VGAM)
+library(table1)
 ```
 
 ```{r}
@@ -62,8 +63,19 @@ soecon_vec <- names(data_cal)[45:57]
 soecon_vec
 ```
 
-# EDA
+# EDA population characteristics
+```{r}
+table1::table1(~Ozone + PM2.5 + Asthma + DieselPM + DrinkingWater + Pesticides + 
+    Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
+    Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + 
+    Poverty + Unemployment + HousingBurden + LowBirthWeight + 
+    CardiovascularDisease , data = data_cal)
 
+#check on if meet ozone standard
+sum(data_cal$Ozone > 0.08, na.rm = TRUE)/dim(data_cal)[1]
+
+sum(data_cal$PM2.5 > 12, na.rm = TRUE)/dim(data_cal)[1]
+```
 ## EDA for Pollution factors
 ```{r}
 #histograms for the air pollution factors
@@ -101,6 +113,15 @@ pairs(Asthma ~ LowBirthWeight + CardiovascularDisease , dat = data_cal)
 ```{r}
 pairs(Asthma ~ Education + LinguisticIsolation + Poverty + Unemployment + HousingBurden, dat = data_cal)
 #pairs(Pop.Char.~ Education + LinguisticIsolation + Poverty + Unemployment + HousingBurden, dat = data_cal)
+
+
+
+pairs(Asthma ~ Ozone + PM2.5 + DieselPM, dat = data_cal)
+pairs(Asthma ~ DrinkingWater + Pesticides + 
+    Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
+    Haz.Waste + Imp.WaterBodies + PollutionBurden, dat = data_cal)
+pairs(Asthma ~ LinguisticIsolation + Poverty + Unemployment + HousingBurden + LowBirthWeight + 
+    CardiovascularDisease, dat = data_cal)
 ```
 
 
