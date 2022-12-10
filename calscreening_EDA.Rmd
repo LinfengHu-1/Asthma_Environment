@@ -177,7 +177,7 @@ plot_pattern(dat)
 ```{r}
 #Attempt Multivariate Imputation
 library(mice)
-tempData = mice(dat, m = 5, maxit = 10, seed = 210)
+tempData = mice(dat, m = 25, maxit = 10, seed = 210)
 summary(tempData)
 #complete(tempData,action=1)
 ```
@@ -680,6 +680,7 @@ mod_imputed
 ```
 
 ```{r}
-mod_nb$converged
+deviance(mod_nb)/mod_nb$df.residual
+deviance(mod_imputed)/mod_imputed$df.residual
 ```
 
