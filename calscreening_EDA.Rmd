@@ -21,6 +21,7 @@ library(ggrepel)
 library(data.table)
 library(nnet)
 library(VGAM)
+library(table1)
 ```
 
 ```{r}
@@ -62,8 +63,19 @@ soecon_vec <- names(data_cal)[45:57]
 soecon_vec
 ```
 
-# EDA
+# EDA population characteristics
+```{r}
+table1::table1(~Ozone + PM2.5 + Asthma + DieselPM + DrinkingWater + Pesticides + 
+    Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
+    Haz.Waste + Imp.WaterBodies + PollutionBurden + LinguisticIsolation + 
+    Poverty + Unemployment + HousingBurden + LowBirthWeight + 
+    CardiovascularDisease , data = data_cal)
 
+#check on if meet ozone standard
+sum(data_cal$Ozone > 0.08, na.rm = TRUE)/dim(data_cal)[1]
+
+sum(data_cal$PM2.5 > 12, na.rm = TRUE)/dim(data_cal)[1]
+```
 ## EDA for Pollution factors
 ```{r}
 #histograms for the air pollution factors
@@ -101,6 +113,15 @@ pairs(Asthma ~ LowBirthWeight + CardiovascularDisease , dat = data_cal)
 ```{r}
 pairs(Asthma ~ Education + LinguisticIsolation + Poverty + Unemployment + HousingBurden, dat = data_cal)
 #pairs(Pop.Char.~ Education + LinguisticIsolation + Poverty + Unemployment + HousingBurden, dat = data_cal)
+
+
+
+pairs(Asthma ~ Ozone + PM2.5 + DieselPM, dat = data_cal)
+pairs(Asthma ~ DrinkingWater + Pesticides + 
+    Tox.Release + Traffic + CleanupSites + GroundwaterThreats + 
+    Haz.Waste + Imp.WaterBodies + PollutionBurden, dat = data_cal)
+pairs(Asthma ~ LinguisticIsolation + Poverty + Unemployment + HousingBurden + LowBirthWeight + 
+    CardiovascularDisease, dat = data_cal)
 ```
 
 
@@ -156,7 +177,7 @@ plot_pattern(dat)
 ```{r}
 #Attempt Multivariate Imputation
 library(mice)
-tempData = mice(dat, m = 5, maxit = 10, seed = 210)
+tempData = mice(dat, m = 25, maxit = 10, seed = 210)
 summary(tempData)
 #complete(tempData,action=1)
 ```
@@ -677,6 +698,7 @@ MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation +
 
 ```{r}
 #yourcodeeee
+<<<<<<< HEAD
 finalmodel1<- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
     Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + PM2.5*Ozone, data=dataint)
 
@@ -695,5 +717,21 @@ finalmodel2
 ```{r}
 deviance(finalmodel1)/finalmodel1$df.residual
 deviance(finalmodel2)/finalmodel2$df.residual
+=======
+mod_nb <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + PM2.5*Ozone, data=dataint)
+mod_nb
+
+#multiple imputed data
+dataint_imputed <- tempData$data |> mutate(Asthma = round(Asthma)) |> mutate(logAsthma = log(Asthma))
+mod_imputed <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + PM2.5*Ozone, data=dataint_imputed)
+mod_imputed
+```
+
+```{r}
+deviance(mod_nb)/mod_nb$df.residual
+deviance(mod_imputed)/mod_imputed$df.residual
+>>>>>>> f58cc10d0b4522dcdd24abe0d94cea3c68cf07bb
 ```
 

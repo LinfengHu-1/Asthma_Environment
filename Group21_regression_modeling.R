@@ -21,6 +21,15 @@ library(ggrepel)
 library(data.table)
 library(nnet)
 library(VGAM)
+library(rgl)
+library(rayshader)
+library(plotly)
+library(glmnet)
+library(splines2)
+library(foreign)
+library(gam)
+library(Hmisc)
+library(MASS)
 
 #' 
 ## ----------------------------------------------------------------------
@@ -515,7 +524,77 @@ mod.ord.npo <- vglm(asthma_cat ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation 
 
 pchisq(deviance(mod.ord)-deviance(mod.ord.npo), df=df.residual(mod.ord)-df.residual(mod.ord.npo),lower.tail=F)
 #proportional odds does not hold --> use multinomial
+y
+
+#Predicted value-----------------------------
+mod.final <- glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+                          Poverty + Unemployment+ LowBirthWeight  + I(Ozone^2) + PM2.5*Ozone, data=dataint)
+summary(mod.final)
+plot(mod.final)
+
+#pm
+predict.pm.data <- data.frame(PM2.5 = seq(from = min(dataint$PM2.5), 
+                                          to = max(dataint$PM2.5), length.out = 100),
+                              Ozone = mean(dataint$Ozone), DieselPM = mean(dataint$DieselPM), 
+                              LinguisticIsolation = mean(dataint$LinguisticIsolation), 
+                              Poverty = mean(dataint$Poverty), Unemployment = mean(dataint$Unemployment), 
+                              LowBirthWeight = mean(dataint$LowBirthWeight))
+
+predict.pm.data <- cbind(predict.pm.data, predict(mod.final, predict.pm.data, type = "link", se.fit = TRUE))
+predict.pm.data <- within(predict.pm.data, {
+  AsthmaRate <- exp(fit)
+  LL <- exp(fit - 1.96*se.fit)
+  UL <- exp(fit + 1.96*se.fit)
+})
+predit.pm.data <- predict.pm.data[order(predict.pm.data$PM2.5),]
+
+ggplot(predict.pm.data, aes(PM2.5, AsthmaRate)) +
+  geom_ribbon(aes(ymin = LL, ymax = UL), alpha = .25) +
+  geom_line(size = 2) + 
+  labs(x = "Annual Mean PM2.5 Concentration", y = "Age-adjusted Rate of Asthma-Related ED Visits by Census Tract")
+
+#ggsave("Predicted PM.png")
+
+#ozone
+predict.ozone.data <- data.frame(Ozone = seq(from = min(dataint$Ozone), 
+                                          to = max(dataint$Ozone), length.out = 100),
+                              PM2.5 = mean(dataint$PM2.5), DieselPM = mean(dataint$DieselPM), 
+                              LinguisticIsolation = mean(dataint$LinguisticIsolation), 
+                              Poverty = mean(dataint$Poverty), Unemployment = mean(dataint$Unemployment), 
+                              LowBirthWeight = mean(dataint$LowBirthWeight))
 
 
+predict.ozone.data <- cbind(predict.ozone.data, predict(mod.final, predict.ozone.data, type = "link", se.fit = TRUE))
+predict.ozone.data <- within(predict.ozone.data, {
+  AsthmaRate <- exp(fit)
+  LL <- exp(fit - 1.96*se.fit)
+  UL <- exp(fit + 1.96*se.fit)
+})
 
+ggplot(predict.ozone.data, aes(Ozone, AsthmaRate)) +
+  geom_ribbon(aes(ymin = LL, ymax = UL), alpha = .25) +
+  geom_line(size = 2) + 
+  labs(x = "Maximum Daily 8-hr Ozone Concentration", y = "Age-adjusted Rate of Asthma-Related ED Visits by Census Tract")
 
+#ggsave("Predicted Ozone.png")
+
+#three dimensional plot
+predict.observed.data <- data.frame(PM2.5 = dataint$PM2.5,
+                              Ozone = dataint$Ozone, DieselPM = mean(dataint$DieselPM), 
+                              LinguisticIsolation = mean(dataint$LinguisticIsolation), 
+                              Poverty = mean(dataint$Poverty), Unemployment = mean(dataint$Unemployment), 
+                              LowBirthWeight = mean(dataint$LowBirthWeight))
+predict.observed.data <- cbind(predict.observed.data, predict(mod.final, predict.observed.data, type = "link", se.fit = TRUE))
+predict.observed.data <- within(predict.observed.data, {
+  AsthmaRate <- exp(fit)
+  LL <- exp(fit - 1.96*se.fit)
+  UL <- exp(fit + 1.96*se.fit)
+})
+
+predicted_matrix <- predict.observed.data %>% dplyr::select(Ozone, PM2.5, AsthmaRate) %>% as.matrix
+predicted_tibble <- as_tibble(predicted_matrix)
+
+fig2 <- plot_ly() %>% 
+  add_trace(data = predicted_tibble,  x=predicted_tibble$Ozone, y=predicted_tibble$PM2.5, 
+            z=predicted_tibble$AsthmaRate, type="mesh3d", color = ~AsthmaRate) 
+fig2
