@@ -574,9 +574,38 @@ The P-value is significant: indicating that the interaction term is significant.
 The final model: 
 MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
     Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + PM2.5*Ozone, data=dataint)
+    
+    
+```{r}
+finfitted <- log(modnb.poisson.qua.pm2.5ozone$fitted.values)
+finres <- modnb.poisson.qua.pm2.5ozone$residuals
 
+x=finfitted
+y = finres
+plot(x=finfitted, y = finres)
+#abline(h = -1, col = 'cornflowerblue', lwd = 2)
+scatter.smooth(y ~ x, span = 2/3, degree = 1, xlab= "Log of Fitted values", ylab= "Residuals")
+```
 
-Make a table that incorporates all the models' original dispersion, original AIC, negative binomical dispersion and negative binomial AIC
+```{r}
+
+plot(modnb.poisson.qua.pm2.5ozone)
+library(gtsummary)
+tbl1<- tbl_regression(modnb.poisson.qua.pm2.5ozone)
+
+```
+
+```{r}
+library(broom)
+
+tidyfit <- tidy(modnb.poisson.qua.pm2.5ozone)
+tidyfit
+
+write.csv(tidyfit, 'tidyfit.csv')
+```
+
+Make a table that incorporates all the models' original dispersion, original AIC, negative binomical dispersion and negative binomial AIC.
+
 ```{r}
 nb_aics <- c(summary(modnb.poisson.sim)$aic,
 summary(modnb.pm_ozone)$aic,
@@ -609,6 +638,7 @@ all_vec
 
 
 Multinomial Regression Testing:
+
 
 ```{r}
 #multinomial regression
@@ -668,6 +698,26 @@ MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation +
 
 ```{r}
 #yourcodeeee
+<<<<<<< HEAD
+finalmodel1<- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + PM2.5*Ozone, data=dataint)
+
+finalmodel1
+#multiple imputed data
+dataint_imputed <- tempData$data |> mutate(Asthma = round(Asthma)) |> mutate(logAsthma = log(Asthma))
+finalmodel2 <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
+    Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + PM2.5*Ozone, data=dataint_imputed)
+
+finalmodel2
+```
+```{r}
+finalmodel1
+finalmodel2
+```
+```{r}
+deviance(finalmodel1)/finalmodel1$df.residual
+deviance(finalmodel2)/finalmodel2$df.residual
+=======
 mod_nb <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
     Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + PM2.5*Ozone, data=dataint)
 mod_nb
@@ -682,5 +732,6 @@ mod_imputed
 ```{r}
 deviance(mod_nb)/mod_nb$df.residual
 deviance(mod_imputed)/mod_imputed$df.residual
+>>>>>>> f58cc10d0b4522dcdd24abe0d94cea3c68cf07bb
 ```
 
