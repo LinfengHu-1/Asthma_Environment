@@ -597,4 +597,7 @@ predicted_tibble <- as_tibble(predicted_matrix)
 fig2 <- plot_ly() %>% 
   add_trace(data = predicted_tibble,  x=predicted_tibble$Ozone, y=predicted_tibble$PM2.5, 
             z=predicted_tibble$AsthmaRate, type="mesh3d", color = ~AsthmaRate) 
-fig2
+axx <- list(title = "Ozone")
+axy <- list(title = "PM2.5 ")
+axz <- list(title = "Predicted Asthma Rate")
+fig2 %>% layout(scene = list(xaxis=axx,yaxis=axy,zaxis=axz))
