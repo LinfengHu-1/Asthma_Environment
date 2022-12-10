@@ -698,7 +698,7 @@ MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation +
 
 ```{r}
 #yourcodeeee
-<<<<<<< HEAD
+
 finalmodel1<- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
     Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + PM2.5*Ozone, data=dataint)
 
@@ -717,21 +717,4 @@ finalmodel2
 ```{r}
 deviance(finalmodel1)/finalmodel1$df.residual
 deviance(finalmodel2)/finalmodel2$df.residual
-=======
-mod_nb <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
-    Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + PM2.5*Ozone, data=dataint)
-mod_nb
-
-#multiple imputed data
-dataint_imputed <- tempData$data |> mutate(Asthma = round(Asthma)) |> mutate(logAsthma = log(Asthma))
-mod_imputed <- MASS::glm.nb(Asthma ~ Ozone + PM2.5 + DieselPM + LinguisticIsolation + 
-    Poverty + Unemployment+ LowBirthWeight+ I(Ozone^2) + PM2.5*Ozone, data=dataint_imputed)
-mod_imputed
 ```
-
-```{r}
-deviance(mod_nb)/mod_nb$df.residual
-deviance(mod_imputed)/mod_imputed$df.residual
->>>>>>> f58cc10d0b4522dcdd24abe0d94cea3c68cf07bb
-```
-

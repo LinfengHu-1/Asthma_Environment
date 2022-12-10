@@ -1,0 +1,11 @@
+name: "my-website"
+output_dir: "."
+navbar:
+  title: "BST210 Final Project"
+  left:
+    - text: "Synergistic effect of Ozone & PM2.5"
+      href: index.html
+  href: https://github.com/LinfengHu-1/Asthma_Environment/
+  output:
+  html_document:
+  theme: darkly
