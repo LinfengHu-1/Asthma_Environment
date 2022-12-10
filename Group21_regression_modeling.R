@@ -22,6 +22,14 @@ library(data.table)
 library(nnet)
 library(VGAM)
 library(rgl)
+library(rayshader)
+library(plotly)
+library(glmnet)
+library(splines2)
+library(foreign)
+library(gam)
+library(Hmisc)
+library(MASS)
 
 #' 
 ## ----------------------------------------------------------------------
@@ -525,12 +533,12 @@ summary(mod.final)
 plot(mod.final)
 
 #pm
-predict.pm.data <- data.frame(PM2.5 = dataint$PM2.5,
-                              Ozone = dataint$Ozone, DieselPM = mean(dataint$DieselPM), 
+predict.pm.data <- data.frame(PM2.5 = seq(from = min(dataint$PM2.5), 
+                                          to = max(dataint$PM2.5), length.out = 100),
+                              Ozone = mean(dataint$Ozone), DieselPM = mean(dataint$DieselPM), 
                               LinguisticIsolation = mean(dataint$LinguisticIsolation), 
                               Poverty = mean(dataint$Poverty), Unemployment = mean(dataint$Unemployment), 
                               LowBirthWeight = mean(dataint$LowBirthWeight))
-
 
 predict.pm.data <- cbind(predict.pm.data, predict(mod.final, predict.pm.data, type = "link", se.fit = TRUE))
 predict.pm.data <- within(predict.pm.data, {
@@ -545,25 +553,7 @@ ggplot(predict.pm.data, aes(PM2.5, AsthmaRate)) +
   geom_line(size = 2) + 
   labs(x = "Annual Mean PM2.5 Concentration", y = "Age-adjusted Rate of Asthma-Related ED Visits by Census Tract")
 
-ggsave("Predicted PM.png")
-
-
-plot3d(predict.pm.data$PM2.5, predict.pm.data$Ozone, predict.pm.data$AsthmaRate, 
-       type = "s", size = 0.5, lit = FALSE)
-spheres3d(predict.pm.data$PM2.5, predict.pm.data$Ozone, predict.pm.data$AsthmaRate, 
-          alpha = 0.4, type = "s", size = 0.5, lit = FALSE)
-
-# Add line segments showing the error
-segments3d(interleave(predict.pm.data$PM2.5t, predict.pm.data$PM2.5),
-           interleave(predict.pm.data$Ozone, predict.pm.data$Ozone),
-           interleave(predict.pm.data$AsthmaRate,  predict.pm.data$AsthmaRate),
-           alpha = 0.4, col = "red")
-
-# Add the mesh of predicted values
-surface3d(mpgrid_list$wt, mpgrid_list$disp, mpgrid_list$mpg,
-          alpha = 0.4, front = "lines", back = "lines")
-
-
+#ggsave("Predicted PM.png")
 
 #ozone
 predict.ozone.data <- data.frame(Ozone = seq(from = min(dataint$Ozone), 
@@ -586,19 +576,25 @@ ggplot(predict.ozone.data, aes(Ozone, AsthmaRate)) +
   geom_line(size = 2) + 
   labs(x = "Maximum Daily 8-hr Ozone Concentration", y = "Age-adjusted Rate of Asthma-Related ED Visits by Census Tract")
 
-ggsave("Predicted Ozone.png")
+#ggsave("Predicted Ozone.png")
 
 #three dimensional plot
+predict.observed.data <- data.frame(PM2.5 = dataint$PM2.5,
+                              Ozone = dataint$Ozone, DieselPM = mean(dataint$DieselPM), 
+                              LinguisticIsolation = mean(dataint$LinguisticIsolation), 
+                              Poverty = mean(dataint$Poverty), Unemployment = mean(dataint$Unemployment), 
+                              LowBirthWeight = mean(dataint$LowBirthWeight))
+predict.observed.data <- cbind(predict.observed.data, predict(mod.final, predict.observed.data, type = "link", se.fit = TRUE))
+predict.observed.data <- within(predict.observed.data, {
+  AsthmaRate <- exp(fit)
+  LL <- exp(fit - 1.96*se.fit)
+  UL <- exp(fit + 1.96*se.fit)
+})
 
+predicted_matrix <- predict.observed.data %>% dplyr::select(Ozone, PM2.5, AsthmaRate) %>% as.matrix
+predicted_tibble <- as_tibble(predicted_matrix)
 
-# Function to interleave the elements of two vectors
-interleave <- function(v1, v2)  as.vector(rbind(v1,v2))
-
-predict.data <- dataint
-predict.data$pred_mpg <- predict(mod.final)
-
-predict.df <- predictgrid(mod.final, "Ozone", "PM2.5", "Asthma")
-predict.list <- df2mat(mpgrid_df)
-
-
-
+fig2 <- plot_ly() %>% 
+  add_trace(data = predicted_tibble,  x=predicted_tibble$Ozone, y=predicted_tibble$PM2.5, 
+            z=predicted_tibble$AsthmaRate, type="mesh3d", color = ~AsthmaRate) 
+fig2
